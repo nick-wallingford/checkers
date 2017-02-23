@@ -10,7 +10,7 @@ using namespace std;
 static void random_agent_test() {
   int max_count = 0;
   int max_seed = 0;
-  for (int i = 0; i < 1000000; i++) {
+  for (int i = 0; i < 10000; i++) {
     position p;
     int count = 0;
     mt19937 rand{i};

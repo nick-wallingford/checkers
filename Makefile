@@ -2,9 +2,8 @@ SRC := $(wildcard *.cpp)
 OBJ := $(SRC:.cpp=.o)
 
 LDFLAGS += $(CXXFLAGS)
-CXXFLAGS += -std=gnu++11 -pipe -march=native -Wall -Wextra -MMD
-CXXFLAGS += $(shell pkg-config --cflags ncurses)
-LDLIBS += $(shell pkg-config --libs ncurses)
+CXXFLAGS += -std=gnu++11 -pipe -march=native -Wall -Wextra -MMD -D_GNU_SOURCE
+LDLIBS += -lncurses -lpthread
 
 release: CXXFLAGS += -O3 -DNDEBUG
 release: checkers
