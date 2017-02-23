@@ -7,9 +7,7 @@
 
 using namespace std;
 
-void get_captured_square_test();
-
-static void position_test() {
+static void random_agent_test() {
   int max_count = 0;
   int max_seed = 0;
   for (int i = 0; i < 1000000; i++) {
@@ -48,10 +46,5 @@ static void position_test() {
 }
 
 int main() {
-  get_captured_square_test();
-  position_test();
-  cout << "Hello world!" << endl;
-
-  //  gen_hash_32();
-  //  gen_hash_64();
+  random_agent_test();
 }
