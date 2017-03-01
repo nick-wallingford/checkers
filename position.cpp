@@ -325,5 +325,19 @@ void position::sanity() const {
     assert(__builtin_popcount(board) <= 12);
   assert(__builtin_popcount(pieces[0] | pieces[2]) <= 12);
   assert(__builtin_popcount(pieces[1] | pieces[3]) <= 12);
+
+  size_t h = 0;
+
+  for (int i = 4; i--;) {
+    for (unsigned a = pieces[i]; a;) {
+      const char square = 32 - __builtin_clz(a);
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+      assert(pieces[i] & piece);
+
+      h ^= zobrist[i][square];
+    }
+  }
+
+  assert(h == hash);
 }
 #endif
