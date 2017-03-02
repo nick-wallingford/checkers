@@ -6,6 +6,10 @@
 using namespace std;
 
 constexpr unsigned square_to_piece(char square) { return 1 << (square - 1); }
+constexpr char piece_to_square(unsigned piece) {
+  return 32 - __builtin_clz(piece);
+}
+
 #define UP 2
 #define DOWN 1
 
@@ -170,7 +174,6 @@ bool position::capture_moves(vector<position> &list, char square) const {
         (captured_piece & pieces[WHITE - to_play]) ? 0 : 2;
     assert(captured_piece & pieces[WHITE - to_play + captured_king]);
 
-    p._hash ^= zobrist_player;
     p._hash ^= zobrist[p.to_play + capturing_king][square - 1];
     p._hash ^= zobrist[p.to_play + capturing_king][m - 1];
     p._hash ^= zobrist[WHITE - p.to_play + captured_king][captured_square - 1];
@@ -181,7 +184,6 @@ bool position::capture_moves(vector<position> &list, char square) const {
 
     capture = true;
     if (!p.capture_moves(list, m)) {
-      p.to_play = 1 - p.to_play;
       list.emplace_back(p);
     }
   }
@@ -213,15 +215,11 @@ vector<position> position::moves() const {
         position p{*this};
         const unsigned next_piece = square_to_piece(s);
 
-        p._hash ^= zobrist_player;
         p._hash ^= zobrist[p.to_play + king][s - 1];
         p._hash ^= zobrist[p.to_play + king][square - 1];
 
         p.pieces[p.to_play + king] ^= piece;
         p.pieces[p.to_play + king] ^= next_piece;
-        p.to_play = 1 - p.to_play;
-
-        p.sanity();
 
         regular.emplace_back(p);
       }
@@ -231,31 +229,36 @@ vector<position> position::moves() const {
   if (captures.empty())
     captures = std::move(regular);
 
-  for (position &p : captures)
-    if (p.pieces[0] & 0xf0000000)
-      for (char square = 32; square > 28; square--) {
-        const unsigned piece = square_to_piece(square);
-        if (pieces[0] & piece) {
-          p._hash ^= zobrist[0][square - 1] ^ zobrist[2][square - 1];
-          p.pieces[0] ^= piece;
-          p.pieces[2] ^= piece;
-        }
-      }
-    else if (p.pieces[1] & 0xf)
-      for (char square = 5; --square;) {
-        const unsigned piece = square_to_piece(square);
-        if (pieces[1] & piece) {
-          p._hash ^= zobrist[1][square - 1] ^ zobrist[3][square - 1];
-          p.pieces[1] ^= piece;
-          p.pieces[3] ^= piece;
-        }
-      }
+  for (position &p : captures) {
+    for (unsigned a = p.pieces[0] & 0xf0000000; a;) {
+      const char square = 32 - __builtin_clz(a);
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      p._hash ^= zobrist[0][square - 1] ^ zobrist[2][square - 1];
+      p.pieces[0] ^= piece;
+      p.pieces[2] ^= piece;
+      a ^= piece;
+    }
+    for (unsigned a = p.pieces[1] & 0x0000000f; a;) {
+      const char square = 32 - __builtin_clz(a);
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      p._hash ^= zobrist[1][square - 1] ^ zobrist[3][square - 1];
+      p.pieces[1] ^= piece;
+      p.pieces[3] ^= piece;
+
+      a ^= piece;
+    }
+
+    p._hash ^= zobrist_player;
+    p.to_play = 1 - p.to_play;
+  }
 
   return captures;
 }
 
 constexpr size_t start_hash(char a) {
-  return a ? (start_hash(a - 1) ^ zobrist[0][a - 1] ^ zobrist[2][32 - a]) : 0;
+  return a ? (start_hash(a - 1) ^ zobrist[0][a - 1] ^ zobrist[1][32 - a]) : 0;
 }
 
 void get_captured_square_test() {
