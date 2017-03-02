@@ -25,7 +25,7 @@ private:
    */
   char to_play;
 
-  bool capture_moves(std::vector<position> &, char) const;
+  bool capture_moves(std::vector<position> &, const char, const unsigned) const;
   unsigned theirs() const {
     return pieces[WHITE - to_play] | pieces[WHITE - to_play + 2];
   }

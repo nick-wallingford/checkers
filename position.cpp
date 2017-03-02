@@ -143,9 +143,9 @@ static char get_captured_square(char now, char later) {
   return (now + later) / 2 + offset;
 }
 
-bool position::capture_moves(vector<position> &list, char square) const {
+bool position::capture_moves(vector<position> &list, const char square,
+                             const unsigned piece) const {
   bool capture = false;
-  const unsigned piece = square_to_piece(square);
   array<char, 4> moves = moves_capture(
       square, (piece & pieces[to_play]) ? (to_play + 1) : (UP | DOWN));
   assert(piece & mine());
@@ -183,7 +183,7 @@ bool position::capture_moves(vector<position> &list, char square) const {
     p.pieces[WHITE - p.to_play + captured_king] ^= captured_piece;
 
     capture = true;
-    if (!p.capture_moves(list, m)) {
+    if (!p.capture_moves(list, m, capturing_piece)) {
       list.emplace_back(p);
     }
   }
@@ -196,33 +196,38 @@ vector<position> position::moves() const {
   vector<position> captures;
   vector<position> regular;
 
-  for (char square = 33; --square;) {
-    const unsigned piece = square_to_piece(square);
-    if (!(mine() & piece))
-      continue;
-    capture_moves(captures, square);
+  for (char king = 0; king <= 2; king += 2) {
+    const char mobility = king ? (UP | DOWN) : (to_play + 1);
+    for (unsigned a = pieces[to_play + king]; a;) {
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+      const char square = 32 - __builtin_clz(a);
 
-    if (captures.empty()) {
-      const char king = (pieces[to_play] & piece) ? 0 : 2;
-      const char mobility = king ? (UP | DOWN) : (to_play + 1);
+      assert(square == piece_to_square(piece));
+      assert(piece == square_to_piece(square));
 
-      for (char s : moves_regular(square, mobility)) {
-        if (!s)
-          continue;
-        if (square_to_piece(s) & all())
-          continue;
+      capture_moves(captures, square, piece);
 
-        position p{*this};
-        const unsigned next_piece = square_to_piece(s);
+      if (captures.empty()) {
+        for (char s : moves_regular(square, mobility)) {
+          if (!s)
+            continue;
+          if (square_to_piece(s) & all())
+            continue;
 
-        p._hash ^= zobrist[p.to_play + king][s - 1];
-        p._hash ^= zobrist[p.to_play + king][square - 1];
+          position p{*this};
+          const unsigned next_piece = square_to_piece(s);
 
-        p.pieces[p.to_play + king] ^= piece;
-        p.pieces[p.to_play + king] ^= next_piece;
+          p._hash ^= zobrist[p.to_play + king][s - 1];
+          p._hash ^= zobrist[p.to_play + king][square - 1];
 
-        regular.emplace_back(p);
+          p.pieces[p.to_play + king] ^= piece;
+          p.pieces[p.to_play + king] ^= next_piece;
+
+          regular.emplace_back(p);
+        }
       }
+
+      a ^= piece;
     }
   }
 
