@@ -44,6 +44,27 @@ public:
     return true;
   }
 
+  int piece_differential() const {
+    return __builtin_popcount(pieces[0]) - __builtin_popcount(pieces[1]);
+  }
+  int king_differential() const {
+    return __builtin_popcount(pieces[2]) - __builtin_popcount(pieces[3]);
+  }
+
+  int eval(bool side, bool kings, bool pieces, unsigned formation, int weight,
+           char power) const {
+    int count = 0;
+    if (kings)
+      count += __builtin_popcount(formation & this->pieces[2 + side]);
+    if (pieces)
+      count += __builtin_popcount(formation & this->pieces[side]);
+    for (char p = power; p--;)
+      weight *= count;
+    for (char p = power; p--;)
+      weight /= __builtin_popcount(formation);
+    return weight;
+  }
+
   std::vector<position> moves() const;
   std::size_t hash() const { return _hash; }
   void sanity() const
