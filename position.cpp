@@ -326,18 +326,20 @@ void position::sanity() const {
   assert(__builtin_popcount(pieces[0] | pieces[2]) <= 12);
   assert(__builtin_popcount(pieces[1] | pieces[3]) <= 12);
 
-  size_t h = 0;
+  size_t h = to_play == BLACK ? 0 : zobrist_player;
 
   for (int i = 4; i--;) {
     for (unsigned a = pieces[i]; a;) {
       const char square = 32 - __builtin_clz(a);
       const unsigned piece = 0x80000000u >> __builtin_clz(a);
+      assert(piece == square_to_piece(square));
       assert(pieces[i] & piece);
 
-      h ^= zobrist[i][square];
+      h ^= zobrist[i][(int)square - 1];
+      a ^= piece;
     }
   }
 
-  assert(h == hash);
+  assert(h == _hash);
 }
 #endif

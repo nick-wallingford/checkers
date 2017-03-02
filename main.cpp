@@ -46,5 +46,7 @@ static void random_agent_test() {
 }
 
 int main() {
+  position p;
+  p.sanity();
   random_agent_test();
 }
