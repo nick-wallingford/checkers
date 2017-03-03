@@ -51,18 +51,12 @@ public:
     return __builtin_popcount(pieces[2]) - __builtin_popcount(pieces[3]);
   }
 
-  int eval(bool side, bool kings, bool pieces, unsigned formation, int weight,
-           char power) const {
-    int count = 0;
-    if (kings)
-      count += __builtin_popcount(formation & this->pieces[2 + side]);
-    if (pieces)
-      count += __builtin_popcount(formation & this->pieces[side]);
-    for (char p = power; p--;)
-      weight *= count;
-    for (char p = power; p--;)
-      weight /= __builtin_popcount(formation);
-    return weight;
+  int eval(unsigned formation, char fields) const {
+    int retval = 0;
+    for (char i = 0; fields; i++, fields >>= 1)
+      if (fields & 1)
+        retval += formation & pieces[(int)i];
+    return retval;
   }
 
   std::vector<position> moves() const;
