@@ -69,5 +69,7 @@ public:
   }
 #endif
 
+  char player() const { return to_play; }
+
   friend std::ostream &operator<<(std::ostream &, const position &);
 };
