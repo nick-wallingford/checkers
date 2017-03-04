@@ -46,7 +46,7 @@ static void random_agent_test() {
   cout << "max count: " << max_count << " seed: " << max_seed << endl;
 }
 
-void gametest() {
+void minimax_test() {
   position p;
 
   evaluator e;
@@ -71,4 +71,8 @@ void gametest() {
   cout << "Game ends after move (2x ply) " << i << endl << p;
 }
 
-int main() { gametest(); }
+int main() {
+  minimax_test();
+
+  return 0;
+}

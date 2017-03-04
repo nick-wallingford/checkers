@@ -8,9 +8,6 @@
 
 using namespace std;
 
-// We use -max() instead of min() because we have to negate them a lot.
-// -min() is zero.
-
 constexpr const int inf = numeric_limits<int>::max();
 
 int minimax::minimize(const position &p, int depth) const {
