@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include "evaluator.hpp"
 
 class position;
@@ -19,6 +21,12 @@ public:
 };
 
 class minimax : public agent {
-  int recursive_eval(const position &, int) const;
+  std::default_random_engine r;
+  int minimize(const position &, int) const;
+  int maximize(const position &, int) const;
+
+public:
+  minimax(const evaluator &e, int depth, char side)
+      : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };

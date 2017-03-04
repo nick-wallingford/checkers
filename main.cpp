@@ -2,6 +2,7 @@
 #include <iostream>
 #include <random>
 
+#include "agent.hpp"
 #include "position.hpp"
 #include "util.hpp"
 
@@ -45,8 +46,29 @@ static void random_agent_test() {
   cout << "max count: " << max_count << " seed: " << max_seed << endl;
 }
 
-int main() {
+void gametest() {
   position p;
-  p.sanity();
-  random_agent_test();
+
+  evaluator e;
+  e.add_formation({0x0000046eu, 20, 2, 1});
+  e.add_formation({0x76200000u, -20, 2, 2});
+  e.add_formation({0x00666600u, 100, 1, 4});
+  e.add_formation({0x00666600u, -100, 1, 8});
+
+  minimax black(e, 7, BLACK);
+  minimax white(evaluator(), 7, WHITE);
+
+  int i = 0;
+  try {
+    for (; i < 200; i++) {
+      cout << p;
+      p = black.get_move(p);
+      cout << p;
+      p = white.get_move(p);
+    }
+  } catch (agent::resign) {
+  }
+  cout << "Game ends after move (2x ply) " << i << endl << p;
 }
+
+int main() { gametest(); }

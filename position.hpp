@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <vector>
 
@@ -53,9 +54,12 @@ public:
 
   int eval(unsigned formation, char fields) const {
     int retval = 0;
-    for (char i = 0; fields; i++, fields >>= 1)
+    for (char i = 0; fields;) {
       if (fields & 1)
-        retval += formation & pieces[(int)i];
+        retval += __builtin_popcount(formation & pieces[(int)i]);
+      fields >>= 1;
+      i++;
+    }
     return retval;
   }
 

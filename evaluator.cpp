@@ -15,7 +15,7 @@ static inline int pow_int(int base, int pow) {
 
 int evaluator::formation::operator()(const position &p) const {
   const char pow = __builtin_popcount(pattern);
-  return weight * pow_int(p.eval(pattern, fields), pow) / pow_int(weight, pow);
+  return weight * pow_int(p.eval(pattern, fields), power) / pow_int(pow, power);
 }
 
 int evaluator::operator()(const position &p) const {
