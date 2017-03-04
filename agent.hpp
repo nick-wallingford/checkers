@@ -30,3 +30,13 @@ public:
       : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };
+
+class negamax : public agent {
+  std::default_random_engine r;
+  int eval(const position &, int) const;
+
+public:
+  negamax(const evaluator &e, int depth, char side)
+      : agent(e, depth, side), r{std::random_device()()} {}
+  position get_move(const position &);
+};
