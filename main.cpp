@@ -75,6 +75,35 @@ static void minimax_vs_negamax() {
   cout << "Game ends after move (2x ply) " << i << endl << p;
 }
 
+static void minimax_vs_alphabeta() {
+  position p;
+  evaluator b_e;
+  b_e.add_formation({0x0000046eu, 20, 2, 1});
+  b_e.add_formation({0x76200000u, -20, 2, 2});
+  b_e.add_formation({0x00666600u, 100, 1, 4});
+  b_e.add_formation({0x00666600u, -100, 1, 8});
+  alphabeta black(b_e, 10, BLACK);
+
+  evaluator w_e;
+  w_e.add_formation({0x0000046eu, 20, 2, 1});
+  w_e.add_formation({0x76200000u, -20, 2, 2});
+  w_e.add_formation({0x00666600u, 100, 1, 4});
+  w_e.add_formation({0x00666600u, -100, 1, 8});
+  minimax white(w_e, 7, WHITE);
+
+  int i = 0;
+  try {
+    for (; i < 200; i++) {
+      cout << p;
+      p = black.get_move(p);
+      cout << p;
+      p = white.get_move(p);
+    }
+  } catch (agent::resign) {
+  }
+  cout << "Game ends after move (2x ply) " << i << endl << p;
+}
+
 static void minimax_test() {
   position p;
 
@@ -101,7 +130,7 @@ static void minimax_test() {
 }
 
 int main() {
-  minimax_vs_negamax();
+  minimax_vs_alphabeta();
 
   return 0;
 }

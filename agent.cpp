@@ -10,76 +10,11 @@ using namespace std;
 
 constexpr const int inf = numeric_limits<int>::max();
 
-int minimax::minimize(const position &p, int depth) const {
-  if (depth <= 0) {
-    if (side == BLACK)
-      return e(p);
-    else
-      return -e(p);
-  }
+int alphabeta::eval(const position &p, int d, int alpha, int beta) const {
+  vector<position> moves = p.moves();
+  if (moves.empty())
+    return -inf;
 
-  int best_score = inf;
-
-  for (const position &next : p.moves()) {
-    const int score = maximize(next, depth - 1);
-    if (score < best_score)
-      best_score = score;
-  }
-
-  return best_score;
-}
-
-int minimax::maximize(const position &p, int depth) const {
-  if (depth <= 0) {
-    if (side == BLACK)
-      return e(p);
-    else
-      return -e(p);
-  }
-  int best_score = -inf;
-
-  for (const position &next : p.moves()) {
-    const int score = minimize(next, depth - 1);
-    if (score > best_score)
-      best_score = score;
-  }
-
-  return best_score;
-}
-
-position minimax::get_move(const position &p) {
-  const vector<position> moves = p.moves();
-  if (moves.size() == 1)
-    return moves[0];
-
-  vector<position> candidates;
-  int best_score = -inf;
-
-  for (const position &next : moves) {
-    const int score = minimize(next, depth);
-    if (score > best_score) {
-      candidates.clear();
-      candidates.push_back(next);
-      best_score = score;
-    } else if (score == best_score) {
-      candidates.push_back(next);
-    }
-  }
-
-  if (best_score == -inf)
-    throw resign();
-
-  assert(!candidates.empty());
-
-  cout << (side == BLACK ? e(p) : -e(p)) << ' ' << best_score << ' '
-       << candidates.size() << endl;
-
-  const int ret =
-      uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);
-  return candidates[ret];
-}
-
-int negamax::eval(const position &p, int d) const {
   if (d <= 0) {
     if ((depth & 1) == (side == BLACK))
       return e(p);
@@ -88,24 +23,27 @@ int negamax::eval(const position &p, int d) const {
   }
 
   int best_score = -inf;
-  for (const position &next : p.moves()) {
-    const int score = -eval(next, d - 1);
-    if (score > best_score)
-      best_score = score;
+  for (const position &next : moves) {
+    best_score = max(best_score, -eval(next, d - 1, -beta, -alpha));
+    alpha = max(alpha, best_score);
+    if (alpha > beta)
+      return best_score;
   }
 
   return best_score;
 }
 
-position negamax::get_move(const position &p) {
+position alphabeta::get_move(const position &p) {
   const vector<position> moves = p.moves();
   if (moves.size() == 1)
     return moves[0];
 
   vector<position> candidates;
   int best_score = -inf;
+  cout << (side == BLACK ? e(p) : -e(p)) << ' ';
+
   for (const position &next : moves) {
-    const int score = -eval(next, depth);
+    const int score = -eval(next, depth, -inf, -best_score);
     if (score > best_score) {
       candidates.clear();
       candidates.push_back(next);
@@ -118,8 +56,10 @@ position negamax::get_move(const position &p) {
     throw resign();
   assert(!candidates.empty());
 
-  cout << (side == BLACK ? e(p) : -e(p)) << ' ' << best_score << ' '
-       << candidates.size() << endl;
+  cout << best_score << ' ' << candidates.size() << endl;
+
+  if (candidates.size() == 1)
+    return candidates[0];
 
   const int ret =
       uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);

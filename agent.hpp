@@ -40,3 +40,13 @@ public:
       : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };
+
+class alphabeta : public agent {
+  std::default_random_engine r;
+  int eval(const position &, int, int alpha, int beta) const;
+
+public:
+  alphabeta(const evaluator &e, int depth, char side)
+      : agent(e, depth, side), r{std::random_device()()} {}
+  position get_move(const position &);
+};
