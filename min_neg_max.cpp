@@ -66,10 +66,8 @@ position minimax::get_move(const position &p) {
     }
   }
 
-  if (best_score == -inf)
+  if (candidates.empty())
     throw resign();
-
-  assert(!candidates.empty());
 
   cout << (side == BLACK ? e(p) : -e(p)) << ' ' << best_score << ' '
        << candidates.size() << endl;
@@ -114,9 +112,8 @@ position negamax::get_move(const position &p) {
       candidates.push_back(next);
     }
   }
-  if (best_score == -inf)
+  if (candidates.empty())
     throw resign();
-  assert(!candidates.empty());
 
   cout << (side == BLACK ? e(p) : -e(p)) << ' ' << best_score << ' '
        << candidates.size() << endl;

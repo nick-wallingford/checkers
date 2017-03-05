@@ -19,38 +19,52 @@ int evaluator::formation::operator()(const position &p) const {
 }
 
 int evaluator::operator()(const position &p) const {
+  const std::array<unsigned, 4> &pieces = p.get_board();
+  const char king_count = __builtin_popcount(pieces[2] | pieces[3]);
+
   int retval = p.piece_differential() * 10;
   retval += p.king_differential() * kingweight;
+  if (king_count < 6)
+    retval += p.king_differential() * (6 - king_count);
+
   for (const formation &f : formations)
     retval += f(p);
+  for (const auto &eval : spec_evaluators)
+    retval += eval_funcs[eval.first](pieces, eval.second);
+
   return retval;
 }
 
 void evaluator::mutate() {
   mt19937 r{random_device()()};
-  uniform_int_distribution<> dist{0, (int)formations.size()};
+  uniform_int_distribution<> dist{0, 2};
 
-  const int modify = dist(r);
-  dist.param(uniform_int_distribution<>::param_type(0, 1));
-  if ((size_t)modify == formations.size()) { // modify king weight
-    if (dist(r))
-      kingweight++;
-    else
-      kingweight--;
-  } else {
-    dist.param(uniform_int_distribution<>::param_type(0, 3));
-    if (dist(r)) { // modify the weight
-      int change = dist(r);
-      if (change <= 1)
-        formations[modify].weight += change - 2;
-      else
-        formations[modify].weight += change - 1;
-    } else { // modify the power
-      dist.param(uniform_int_distribution<>::param_type(0, 1));
-      if (dist(r))
-        formations[modify].power++;
-      else
-        formations[modify].power--;
-    }
+  switch (dist(r)) {
+  case 0:
+    kingweight++;
+    break;
+  case 1:
+    kingweight--;
+    break;
   }
+
+  for (formation &f : formations)
+    switch (dist(r)) {
+    case 0:
+      ++f;
+      break;
+    case 1:
+      --f;
+      break;
+    }
+
+  for (std::pair<eval_names, int> &eval : spec_evaluators)
+    switch (dist(r)) {
+    case 0:
+      eval.second++;
+      break;
+    case 1:
+      eval.second--;
+      break;
+    }
 }

@@ -5,8 +5,11 @@
 #include "agent.hpp"
 #include "position.hpp"
 #include "util.hpp"
+#include "evaluators.hpp"
 
 using namespace std;
+
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 static void random_agent_test() {
   int max_count = 0;

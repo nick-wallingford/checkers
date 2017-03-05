@@ -1,7 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <utility>
 #include <vector>
+
+#include "evaluators.hpp"
 
 class position;
 
@@ -16,6 +19,8 @@ public:
     char power;
     char fields;
     int operator()(const position &) const;
+    void operator++() { weight++; }
+    void operator--() { weight++; }
   };
 
   evaluator() : kingweight{20} {}
@@ -27,5 +32,6 @@ public:
 
 private:
   std::vector<formation> formations;
+  std::vector<std::pair<eval_names,int>> spec_evaluators;
   int kingweight;
 };

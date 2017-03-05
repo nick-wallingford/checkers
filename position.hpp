@@ -11,7 +11,6 @@
 class position {
 private:
   std::size_t _hash;
-
   /**
    * Array of positions on the board of the four different types of pieces.
    * pieces[0] are the black regular pieces.
@@ -63,6 +62,7 @@ public:
     return retval;
   }
 
+  const std::array<unsigned, 4> &get_board() const { return pieces; }
   std::vector<position> moves() const;
   std::size_t hash() const { return _hash; }
   void sanity() const

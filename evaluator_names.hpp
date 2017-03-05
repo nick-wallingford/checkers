@@ -1,0 +1,1 @@
+REGISTER_ENUM(eval_trapped_kings)
