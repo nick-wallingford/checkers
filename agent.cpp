@@ -40,7 +40,7 @@ position alphabeta::get_move(const position &p) {
 
   vector<position> candidates;
   int best_score = -inf;
-  cout << (side == BLACK ? e(p) : -e(p)) << ' ';
+  cout << (side == BLACK ? e(p) : -e(p)) << ' ' << flush;
 
   for (const position &next : moves) {
     const int score = -eval(next, depth, -inf, -best_score);
@@ -52,16 +52,16 @@ position alphabeta::get_move(const position &p) {
       candidates.push_back(next);
     }
   }
-  if (best_score == -inf)
-    throw resign();
-  assert(!candidates.empty());
 
   cout << best_score << ' ' << candidates.size() << endl;
 
-  if (candidates.size() == 1)
+  if (candidates.empty())
+    throw resign();
+  else if (candidates.size() == 1)
     return candidates[0];
-
-  const int ret =
-      uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);
-  return candidates[ret];
+  else {
+    const int ret =
+        uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);
+    return candidates[ret];
+  }
 }

@@ -291,9 +291,9 @@ ostream &operator<<(ostream &o, const position &p) {
   const string king{"♣"};
 
   if (p.to_play)
-    o << white << "To play: White" << color_reset << endl;
+    o << white << "To play: White" << color_reset << '\n';
   else
-    o << black << "To play: Black" << color_reset << endl;
+    o << black << "To play: Black" << color_reset << '\n';
   for (char i = 0; i < 8; i++) {
     if (!(i & 1))
       o << null_square;
