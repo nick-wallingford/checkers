@@ -26,12 +26,15 @@ public:
   evaluator() : kingweight{20} {}
   void mutate();
   void add_formation(formation f) { formations.emplace_back(f); };
+  void add_evaluator(eval_names n, int weight) {
+    spec_evaluators.emplace_back(n, weight);
+  }
   int operator()(const position &) const;
 
   friend std::ostream &operator<<(std::ostream &o, const evaluator &);
 
 private:
   std::vector<formation> formations;
-  std::vector<std::pair<eval_names,int>> spec_evaluators;
+  std::vector<std::pair<eval_names, int>> spec_evaluators;
   int kingweight;
 };

@@ -3,9 +3,9 @@
 #include <random>
 
 #include "agent.hpp"
+#include "evaluators.hpp"
 #include "position.hpp"
 #include "util.hpp"
-#include "evaluators.hpp"
 
 using namespace std;
 
@@ -85,6 +85,7 @@ static void minimax_vs_alphabeta() {
   b_e.add_formation({0x76200000u, -20, 2, 2});
   b_e.add_formation({0x00666600u, 100, 1, 4});
   b_e.add_formation({0x00666600u, -100, 1, 8});
+  b_e.add_evaluator(eval_trapped_kings,10);
   alphabeta black(b_e, 8, BLACK);
 
   evaluator w_e;
