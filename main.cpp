@@ -11,6 +11,31 @@ using namespace std;
 
 #pragma GCC diagnostic ignored "-Wunused-function"
 
+template <class S, class T, int depth = 8> char game_test(const evaluator &e) {
+  position p;
+  S black{e, depth, BLACK};
+  T white{e, depth, WHITE};
+  int i;
+  try {
+    for (i = 0; i < 256; i++) {
+      cout << p;
+      p = black.get_move(p);
+      cout << p;
+      p = white.get_move(p);
+    }
+    cout << "Draw after 256 moves." << endl;
+    return 0;
+  } catch (agent::resign) {
+    if (p.player() == BLACK) {
+      cout << "White wins after " << i << " moves." << endl;
+      return -1;
+    } else {
+      cout << "Black wins after " << i << " moves." << endl;
+      return 1;
+    }
+  }
+}
+
 static void random_agent_test() {
   int max_count = 0;
   int max_seed = 0;
@@ -49,92 +74,14 @@ static void random_agent_test() {
   cout << "max count: " << max_count << " seed: " << max_seed << endl;
 }
 
-static void minimax_vs_negamax() {
-  position p;
-  evaluator b_e;
-  b_e.add_formation({0x0000046eu, 20, 2, 1});
-  b_e.add_formation({0x76200000u, -20, 2, 2});
-  b_e.add_formation({0x00666600u, 100, 1, 4});
-  b_e.add_formation({0x00666600u, -100, 1, 8});
-  negamax black(b_e, 7, BLACK);
-
-  evaluator w_e;
-  w_e.add_formation({0x0000046eu, 20, 2, 1});
-  w_e.add_formation({0x76200000u, -20, 2, 2});
-  w_e.add_formation({0x00666600u, 100, 1, 4});
-  w_e.add_formation({0x00666600u, -100, 1, 8});
-  minimax white(w_e, 7, WHITE);
-
-  int i = 0;
-  try {
-    for (; i < 200; i++) {
-      cout << p;
-      p = black.get_move(p);
-      cout << p;
-      p = white.get_move(p);
-    }
-  } catch (agent::resign) {
-  }
-  cout << "Game ends after move (2x ply) " << i << endl << p;
-}
-
-static void minimax_vs_alphabeta() {
-  position p;
-  evaluator b_e;
-  b_e.add_formation({0x0000046eu, 20, 2, 1});
-  b_e.add_formation({0x76200000u, -20, 2, 2});
-  b_e.add_formation({0x00666600u, 100, 1, 4});
-  b_e.add_formation({0x00666600u, -100, 1, 8});
-  //b_e.add_evaluator(eval_trapped_kings, 10);
-  alphabeta black(b_e, 9, BLACK);
-
-  evaluator w_e;
-  w_e.add_formation({0x0000046eu, 20, 2, 1});
-  w_e.add_formation({0x76200000u, -20, 2, 2});
-  w_e.add_formation({0x00666600u, 100, 1, 4});
-  w_e.add_formation({0x00666600u, -100, 1, 8});
-  minimax white(w_e, 9, WHITE);
-
-  int i = 0;
-  try {
-    for (; i < 200; i++) {
-      cout << p;
-      p = black.get_move(p);
-      cout << p;
-      p = white.get_move(p);
-    }
-  } catch (agent::resign) {
-  }
-  cout << "Game ends after move (2x ply) " << i << endl << p;
-}
-
-static void minimax_test() {
-  position p;
-
-  evaluator e;
-  e.add_formation({0x0000046eu, 20, 2, 1});
-  e.add_formation({0x76200000u, -20, 2, 2});
-  e.add_formation({0x00666600u, 100, 1, 4});
-  e.add_formation({0x00666600u, -100, 1, 8});
-
-  minimax black(e, 7, BLACK);
-  minimax white(evaluator(), 7, WHITE);
-
-  int i = 0;
-  try {
-    for (; i < 200; i++) {
-      cout << p;
-      p = black.get_move(p);
-      cout << p;
-      p = white.get_move(p);
-    }
-  } catch (agent::resign) {
-  }
-  cout << "Game ends after move (2x ply) " << i << endl << p;
-}
-
 int main() {
-  minimax_vs_alphabeta();
+  evaluator e;
+  e.add_evaluator(eval_white_pyramid, 20);
+  e.add_evaluator(eval_black_pyramid, 20);
+  e.add_evaluator(eval_centralized_kings, 5);
+  e.add_evaluator(eval_trapped_kings, 10);
+
+  game_test<alphabeta, alphabeta, 6>(e);
 
   return 0;
 }

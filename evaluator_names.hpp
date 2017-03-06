@@ -1,1 +1,4 @@
 REGISTER_ENUM(eval_trapped_kings)
+REGISTER_ENUM(eval_black_pyramid)
+REGISTER_ENUM(eval_white_pyramid)
+REGISTER_ENUM(eval_centralized_kings)
