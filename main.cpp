@@ -85,15 +85,15 @@ static void minimax_vs_alphabeta() {
   b_e.add_formation({0x76200000u, -20, 2, 2});
   b_e.add_formation({0x00666600u, 100, 1, 4});
   b_e.add_formation({0x00666600u, -100, 1, 8});
-  b_e.add_evaluator(eval_trapped_kings, 10);
-  alphabeta black(b_e, 8, BLACK);
+  //b_e.add_evaluator(eval_trapped_kings, 10);
+  alphabeta black(b_e, 9, BLACK);
 
   evaluator w_e;
   w_e.add_formation({0x0000046eu, 20, 2, 1});
   w_e.add_formation({0x76200000u, -20, 2, 2});
   w_e.add_formation({0x00666600u, 100, 1, 4});
   w_e.add_formation({0x00666600u, -100, 1, 8});
-  minimax white(w_e, 7, WHITE);
+  minimax white(w_e, 9, WHITE);
 
   int i = 0;
   try {
