@@ -30,7 +30,7 @@ int evaluator::operator()(const position &p) const {
   for (const formation &f : formations)
     retval += f(p);
   for (const auto &eval : spec_evaluators)
-    retval += eval_funcs[eval.first](pieces, eval.second);
+    retval += eval_funcs[eval.first](pieces, p.player(), eval.second);
 
   return retval;
 }

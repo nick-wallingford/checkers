@@ -8,12 +8,13 @@ namespace eval {
  * 'REGISTER_ENUM(<func_name>)' entry in evaluator_names.hpp
  *
  * All functions in this file must have the signature:
- * int eval_<descriptive_name>(const array<unsigned, 4>, int)
+ * int eval_<descriptive_name>(const array<unsigned, 4>, char, int)
  *
  * They must also be within namespace eval{}
  */
 
-int eval_trapped_kings(const array<unsigned, 4> &pieces, int weight) {
+int eval_trapped_kings(const array<unsigned, 4> &pieces, char player,
+                       int weight) {
   return 0;
 }
 }

@@ -85,7 +85,7 @@ static void minimax_vs_alphabeta() {
   b_e.add_formation({0x76200000u, -20, 2, 2});
   b_e.add_formation({0x00666600u, 100, 1, 4});
   b_e.add_formation({0x00666600u, -100, 1, 8});
-  b_e.add_evaluator(eval_trapped_kings,10);
+  b_e.add_evaluator(eval_trapped_kings, 10);
   alphabeta black(b_e, 8, BLACK);
 
   evaluator w_e;

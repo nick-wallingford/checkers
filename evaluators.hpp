@@ -20,13 +20,13 @@ static const char *eval_names_text[] = {
 #undef REGISTER_ENUM
 
 namespace eval {
-#define REGISTER_ENUM(x) int x(const std::array<unsigned, 4> &, int);
+#define REGISTER_ENUM(x) int x(const std::array<unsigned, 4> &, char, int);
 #include "evaluator_names.hpp"
 #undef REGISTER_ENUM
 }
 
 #define REGISTER_ENUM(x) &eval::x,
-static const std::function<int(const std::array<unsigned, 4> &, int)>
+static const std::function<int(const std::array<unsigned, 4> &, char, int)>
     eval_funcs[]{
 #include "evaluator_names.hpp"
         NULL};
