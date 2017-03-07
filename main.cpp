@@ -1,6 +1,8 @@
 #include <array>
 #include <iostream>
 #include <random>
+#include <unordered_map>
+#include <vector>
 
 #include "agent.hpp"
 #include "heuristic.hpp"
@@ -41,7 +43,7 @@ int main() {
   e.add_evaluator(eval_centralized_kings, 5);
   e.add_evaluator(eval_trapped_kings, 10);
 
-  game_test<alphabeta, alphabeta, 9>(e);
+  game_test<alphabeta, minimax, 6>(e);
 
   return 0;
 }

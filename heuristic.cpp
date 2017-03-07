@@ -12,6 +12,7 @@ int heuristic::operator()(const position &p) const {
 
   int retval = p.piece_differential() * 10;
   retval += p.king_differential() * kingweight;
+
   if (king_count < 6)
     retval += p.king_differential() * (6 - king_count);
 

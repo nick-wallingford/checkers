@@ -15,6 +15,8 @@ public:
         hash{new size_t[mask + 1]},           // hash is NOT initialized to 0
         score{new int[mask + 1]}              // score is NOT initialized to 0
   {}
+  ~hashmap();
 
+  bool contains(unsigned char, size_t) const;
   int &operator()(unsigned char, size_t);
 };

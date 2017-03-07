@@ -12,6 +12,7 @@ using namespace std;
 constexpr const int inf = numeric_limits<int>::max();
 
 int alphabeta::eval(const position &p, int d, int alpha, int beta) {
+  assert(alpha <= beta);
   vector<position> moves = p.moves();
   if (moves.empty())
     return -inf;
@@ -23,19 +24,24 @@ int alphabeta::eval(const position &p, int d, int alpha, int beta) {
       return -e(p);
   }
 
-  int &cached_score = cache(d, p.hash());
-  if (cached_score != numeric_limits<int>::min())
-    return cached_score;
+  if (cache.contains(d, p.hash()))
+    return cache(d, p.hash());
 
+  int local_alpha = alpha;
   int best_score = -inf;
+
   for (const position &next : moves) {
-    best_score = max(best_score, -eval(next, d - 1, -beta, -alpha));
-    alpha = max(alpha, best_score);
-    if (alpha > beta)
-      return cached_score = best_score;
+    const int score = -eval(next, d - 1, -beta, -local_alpha);
+    best_score = max(best_score, score);
+    if (best_score > beta)
+      return best_score;
+    local_alpha = max(local_alpha, best_score);
   }
 
-  return cached_score = best_score;
+  if (beta > best_score && best_score > alpha)
+    cache(d, p.hash()) = best_score;
+
+  return best_score;
 }
 
 position alphabeta::get_move(const position &p) {

@@ -20,7 +20,7 @@ namespace eval {
 
 int eval_black_pyramid(const array<unsigned, 4> &pieces,
                        char player __attribute__((unused)), int weight) {
-  int retval = __builtin_popcount(pieces[0] & 0x46e);
+  int retval = __builtin_popcount(pieces[0] & 0x267);
   retval *= retval * weight;
   retval /= 36;
   return retval;
@@ -28,7 +28,7 @@ int eval_black_pyramid(const array<unsigned, 4> &pieces,
 
 int eval_white_pyramid(const array<unsigned, 4> &pieces,
                        char player __attribute__((unused)), int weight) {
-  int retval = __builtin_popcount(pieces[0] & 0x76200000u);
+  int retval = __builtin_popcount(pieces[1] & 0xe6400000u);
   retval *= retval * -weight;
   retval /= 36;
   return retval;
@@ -36,13 +36,15 @@ int eval_white_pyramid(const array<unsigned, 4> &pieces,
 
 int eval_centralized_kings(const array<unsigned, 4> &pieces,
                            char player __attribute((unused)), int weight) {
-  int retval = __builtin_popcount(pieces[0] & 0x00666600u);
-  retval -= __builtin_popcount(pieces[1] & 0x00666600u);
+  int retval = __builtin_popcount(pieces[2] & 0x00666600u);
+  retval -= __builtin_popcount(pieces[3] & 0x00666600u);
   return weight * retval;
 }
 
 int eval_trapped_kings(const array<unsigned, 4> &pieces, char player,
                        int weight) {
+  return 0;
+
   int retval = 0;
   if (player) {                        // white to play
     for (unsigned a = pieces[2]; a;) { // search for trapped black kings
