@@ -9,8 +9,6 @@
 
 using namespace std;
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-
 template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
   position p;
   S black{e, depth, BLACK};
@@ -36,44 +34,6 @@ template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
   }
 }
 
-static void random_agent_test() {
-  int max_count = 0;
-  int max_seed = 0;
-  for (int i = 0; i < 10000; i++) {
-    position p;
-    int count = 0;
-    mt19937 rand{i};
-    rand.discard(10000);
-
-    for (vector<position> moves = p.moves(); !moves.empty();
-         moves = p.moves()) {
-      ++count;
-
-      uniform_int_distribution<size_t> d{0, moves.size() - 1};
-      p = moves[d(rand)];
-    }
-
-    if (count > max_count) {
-      max_count = count;
-      max_seed = i;
-      cout << "max count: " << max_count << " seed: " << max_seed << endl;
-    }
-  }
-
-  position p;
-  mt19937 rand{max_seed};
-  rand.discard(10000);
-
-  for (vector<position> moves = p.moves(); !moves.empty(); moves = p.moves()) {
-    cout << p << endl;
-    uniform_int_distribution<size_t> d{0, moves.size() - 1};
-    p = moves[d(rand)];
-  }
-
-  cout << p << endl;
-  cout << "max count: " << max_count << " seed: " << max_seed << endl;
-}
-
 int main() {
   heuristic e;
   e.add_evaluator(eval_white_pyramid, 20);
@@ -81,7 +41,7 @@ int main() {
   e.add_evaluator(eval_centralized_kings, 5);
   e.add_evaluator(eval_trapped_kings, 10);
 
-  game_test<alphabeta, alphabeta, 6>(e);
+  game_test<alphabeta, alphabeta, 9>(e);
 
   return 0;
 }
