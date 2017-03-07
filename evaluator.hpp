@@ -1,40 +1,35 @@
 #pragma once
 
-#include <iostream>
-#include <utility>
-#include <vector>
+#include <array>
+#include <functional>
 
-#include "evaluators.hpp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 
-class position;
-
-class evaluator {
-public:
-  enum side { black, white, both };
-  struct formation {
-    formation(unsigned pattern, int weight, char power, char fields)
-        : pattern{pattern}, weight{weight}, power{power}, fields{fields} {}
-    unsigned pattern;
-    int weight;
-    char power;
-    char fields;
-    int operator()(const position &) const;
-    void operator++() { weight++; }
-    void operator--() { weight++; }
-  };
-
-  evaluator() : kingweight{20} {}
-  void mutate();
-  void add_formation(formation f) { formations.emplace_back(f); };
-  void add_evaluator(eval_names n, int weight) {
-    spec_evaluators.emplace_back(n, weight);
-  }
-  int operator()(const position &) const;
-
-  friend std::ostream &operator<<(std::ostream &o, const evaluator &);
-
-private:
-  std::vector<formation> formations;
-  std::vector<std::pair<eval_names, int>> spec_evaluators;
-  int kingweight;
+#define REGISTER_ENUM(x) x,
+enum eval_names {
+#include "evaluator_names.hpp"
+  eval_count
 };
+#undef REGISTER_ENUM
+
+#define REGISTER_ENUM(x) #x,
+static const char *eval_names_text[] = {
+#include "evaluator_names.hpp"
+    "invalid"};
+#undef REGISTER_ENUM
+
+namespace eval {
+#define REGISTER_ENUM(x) int x(const std::array<unsigned, 4> &, char, int);
+#include "evaluator_names.hpp"
+#undef REGISTER_ENUM
+}
+
+#define REGISTER_ENUM(x) &eval::x,
+static const std::function<int(const std::array<unsigned, 4> &, char, int)>
+    eval_funcs[]{
+#include "evaluator_names.hpp"
+        NULL};
+#undef REGISTER_ENUM
+
+#pragma GCC diagnostic pop

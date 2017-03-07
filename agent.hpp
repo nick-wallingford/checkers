@@ -2,19 +2,19 @@
 
 #include <random>
 
-#include "evaluator.hpp"
+#include "heuristic.hpp"
 
 class position;
 
 class agent {
 protected:
-  evaluator e;
+  heuristic e;
   int depth;
   char side;
 
 public:
   class resign {};
-  agent(const evaluator &e, int depth, char side)
+  agent(const heuristic &e, int depth, char side)
       : e{e}, depth{depth}, side{side} {}
   virtual ~agent() {}
   virtual position get_move(const position &) = 0;
@@ -26,7 +26,7 @@ class minimax : public agent {
   int maximize(const position &, int) const;
 
 public:
-  minimax(const evaluator &e, int depth, char side)
+  minimax(const heuristic &e, int depth, char side)
       : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };
@@ -36,7 +36,7 @@ class negamax : public agent {
   int eval(const position &, int) const;
 
 public:
-  negamax(const evaluator &e, int depth, char side)
+  negamax(const heuristic &e, int depth, char side)
       : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };
@@ -46,7 +46,7 @@ class alphabeta : public agent {
   int eval(const position &, int, int alpha, int beta) const;
 
 public:
-  alphabeta(const evaluator &e, int depth, char side)
+  alphabeta(const heuristic &e, int depth, char side)
       : agent(e, depth, side), r{std::random_device()()} {}
   position get_move(const position &);
 };

@@ -1,70 +1,72 @@
 #include "evaluator.hpp"
 
-#include <random>
-
-#include "position.hpp"
-
 using namespace std;
 
-static inline int pow_int(int base, int pow) {
-  int retval = 1;
-  while (pow--)
-    retval *= base;
+constexpr unsigned square_to_piece(char square) { return 1 << (square - 1); }
+constexpr char piece_to_square(unsigned piece) {
+  return 32 - __builtin_clz(piece);
+}
+
+namespace eval {
+/*
+ * For every function in this file, there should be a corresponding
+ * 'REGISTER_ENUM(<func_name>)' entry in evaluator_names.hpp
+ *
+ * All functions in this file must have the signature:
+ * int eval_<descriptive_name>(const array<unsigned, 4>, char, int)
+ *
+ * They must also be within namespace eval{}
+ */
+
+int eval_black_pyramid(const array<unsigned, 4> &pieces,
+                       char player __attribute__((unused)), int weight) {
+  int retval = __builtin_popcount(pieces[0] & 0x46e);
+  retval *= retval * weight;
+  retval /= 36;
   return retval;
 }
 
-int evaluator::formation::operator()(const position &p) const {
-  const char pow = __builtin_popcount(pattern);
-  return weight * pow_int(p.eval(pattern, fields), power) / pow_int(pow, power);
-}
-
-int evaluator::operator()(const position &p) const {
-  const std::array<unsigned, 4> &pieces = p.get_board();
-  const char king_count = __builtin_popcount(pieces[2] | pieces[3]);
-
-  int retval = p.piece_differential() * 10;
-  retval += p.king_differential() * kingweight;
-  if (king_count < 6)
-    retval += p.king_differential() * (6 - king_count);
-
-  for (const formation &f : formations)
-    retval += f(p);
-  for (const auto &eval : spec_evaluators)
-    retval += eval_funcs[eval.first](pieces, p.player(), eval.second);
-
+int eval_white_pyramid(const array<unsigned, 4> &pieces,
+                       char player __attribute__((unused)), int weight) {
+  int retval = __builtin_popcount(pieces[0] & 0x76200000u);
+  retval *= retval * -weight;
+  retval /= 36;
   return retval;
 }
 
-void evaluator::mutate() {
-  mt19937 r{random_device()()};
-  uniform_int_distribution<> dist{0, 2};
+int eval_centralized_kings(const array<unsigned, 4> &pieces,
+                           char player __attribute((unused)), int weight) {
+  int retval = __builtin_popcount(pieces[0] & 0x00666600u);
+  retval -= __builtin_popcount(pieces[1] & 0x00666600u);
+  return weight * retval;
+}
 
-  switch (dist(r)) {
-  case 0:
-    kingweight++;
-    break;
-  case 1:
-    kingweight--;
-    break;
+int eval_trapped_kings(const array<unsigned, 4> &pieces, char player,
+                       int weight) {
+  int retval = 0;
+  if (player) {                        // white to play
+    for (unsigned a = pieces[2]; a;) { // search for trapped black kings
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      a ^= piece;
+    }
+    for (unsigned a = pieces[3]; a;) { // search for trapped white kings
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      a ^= piece;
+    }
+  } else {                             // black to play
+    for (unsigned a = pieces[2]; a;) { // search for trapped black kings
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      a ^= piece;
+    }
+    for (unsigned a = pieces[3]; a;) { // search for trapped white kings
+      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+
+      a ^= piece;
+    }
   }
-
-  for (formation &f : formations)
-    switch (dist(r)) {
-    case 0:
-      ++f;
-      break;
-    case 1:
-      --f;
-      break;
-    }
-
-  for (std::pair<eval_names, int> &eval : spec_evaluators)
-    switch (dist(r)) {
-    case 0:
-      eval.second++;
-      break;
-    case 1:
-      eval.second--;
-      break;
-    }
+  return retval;
+}
 }

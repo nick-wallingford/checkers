@@ -3,7 +3,7 @@
 #include <random>
 
 #include "agent.hpp"
-#include "evaluators.hpp"
+#include "heuristic.hpp"
 #include "position.hpp"
 #include "util.hpp"
 
@@ -11,7 +11,7 @@ using namespace std;
 
 #pragma GCC diagnostic ignored "-Wunused-function"
 
-template <class S, class T, int depth = 8> char game_test(const evaluator &e) {
+template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
   position p;
   S black{e, depth, BLACK};
   T white{e, depth, WHITE};
@@ -75,7 +75,7 @@ static void random_agent_test() {
 }
 
 int main() {
-  evaluator e;
+  heuristic e;
   e.add_evaluator(eval_white_pyramid, 20);
   e.add_evaluator(eval_black_pyramid, 20);
   e.add_evaluator(eval_centralized_kings, 5);

@@ -51,17 +51,6 @@ public:
     return __builtin_popcount(pieces[2]) - __builtin_popcount(pieces[3]);
   }
 
-  int eval(unsigned formation, char fields) const {
-    int retval = 0;
-    for (char i = 0; fields;) {
-      if (fields & 1)
-        retval += __builtin_popcount(formation & pieces[(int)i]);
-      fields >>= 1;
-      i++;
-    }
-    return retval;
-  }
-
   const std::array<unsigned, 4> &get_board() const { return pieces; }
   std::vector<position> moves() const;
   std::size_t hash() const { return _hash; }

@@ -1,6 +1,7 @@
 #include "agent.hpp"
 
 #include <cassert>
+#include <iostream>
 #include <limits>
 #include <vector>
 
