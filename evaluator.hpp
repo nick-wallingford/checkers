@@ -2,6 +2,7 @@
 
 #include <array>
 #include <functional>
+#include <string>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -14,9 +15,10 @@ enum eval_names {
 #undef REGISTER_ENUM
 
 #define REGISTER_ENUM(x) #x,
-static const char *eval_names_text[] = {
+static const std::array<std::string, eval_names::eval_count + 1>
+    eval_names_text{
 #include "evaluator_names.hpp"
-    "invalid"};
+        "invalid"};
 #undef REGISTER_ENUM
 
 namespace eval {
@@ -26,8 +28,10 @@ namespace eval {
 }
 
 #define REGISTER_ENUM(x) &eval::x,
-static const std::function<int(const std::array<unsigned, 4> &, char, int)>
-    eval_funcs[]{
+static const std::array<
+    std::function<int(const std::array<unsigned, 4> &, char, int)>,
+    eval_names::eval_count + 1>
+    eval_funcs{
 #include "evaluator_names.hpp"
         NULL};
 #undef REGISTER_ENUM
