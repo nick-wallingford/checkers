@@ -7,8 +7,13 @@
 
 using namespace std;
 
-template <typename T> void generate_hashes(T seed) {
-  uniform_int_distribution<T> dist{0, numeric_limits<T>::max()};
+void gen_hash_64() {
+  const double f = M_PI;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+  const uint64_t seed = *(uint64_t *)&f;
+#pragma GCC diagnostic pop
+  uniform_int_distribution<uint64_t> dist{0, numeric_limits<uint64_t>::max()};
   mt19937 rand{seed};
   rand.discard(10000);
 
@@ -17,36 +22,23 @@ template <typename T> void generate_hashes(T seed) {
   char oldFill = cout.fill();
 
   cout << hex << showbase << internal << setfill('0');
-  cout << "static const size_t zobrist_player = " << dist(rand) << ";\n";
-  cout << "static const size_t zobrist[4][32] = {\n";
+  cout << "static const uint64_t zobrist_player = " << dist(rand) << ";\n";
+  cout << "static const std::array<std::array<uint64_t, 32>, 4> zobrist{{\n";
   for (int i = 4; i--;) {
-    cout << '{';
+    cout << "{{";
+
     for (int j = 32; j--;) {
       cout << dist(rand);
       if (j)
         cout << ',';
     }
-    cout << '}';
+    cout << "}}";
     if (i)
       cout << ',';
   }
-  cout << "};\n";
+  cout << "}};\n";
 
   cout.flags(oldFlags);
   cout.precision(oldPrec);
   cout.fill(oldFill);
 }
-
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-void gen_hash_32() {
-  const float f = M_PI;
-  const uint32_t i = *(uint32_t *)&f;
-  generate_hashes<uint32_t>(i);
-}
-void gen_hash_64() {
-  const double f = M_PI;
-  const uint64_t i = *(uint64_t *)&f;
-  generate_hashes<uint64_t>(i);
-}
-#pragma GCC diagnostic warning "-Wstrict-aliasing"
-
