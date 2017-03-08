@@ -17,8 +17,8 @@ class alphabeta_cache : public agent {
   int eval(const position &, unsigned char, int alpha, int beta, bool maximize);
 
 public:
-  alphabeta_cache(const heuristic &e, int depth, char side)
-      : agent(e, depth, side), mask{((size_t)1 << 16) - 1},
+  alphabeta_cache(const heuristic &e, int d, char side)
+      : agent(e, d, side), mask{((size_t)1 << 16) - 1},
         depth{new unsigned char[mask + 1]()}, hash{new size_t[mask + 1]},
         minimum{new int[mask + 1]}, exact{new int[mask + 1]},
         maximum{new int[mask + 1]}, r{std::random_device{}()} {}

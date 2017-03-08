@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "agent.hpp"
+#include "alphabeta_cache.hpp"
 #include "heuristic.hpp"
 #include "position.hpp"
 #include "util.hpp"

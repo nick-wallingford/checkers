@@ -52,7 +52,7 @@ position alphabeta_cache::get_move(const position &p) {
   cout << (side == BLACK ? e(p) : -e(p)) << ' ' << flush;
 
   for (const position &next : moves) {
-    const int score = eval(next, depth - 1, best_score, inf, false);
+    const int score = eval(next, agent::depth - 1, best_score, inf, false);
     if (score > best_score) {
       candidates.clear();
       candidates.push_back(next);
