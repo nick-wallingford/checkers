@@ -42,7 +42,7 @@ int eval_centralized_kings(const array<unsigned, 4> &pieces,
 }
 
 int eval_trapped_kings(const array<unsigned, 4> &pieces, char player,
-                       int weight) {
+                       int) {
   return 0;
 
   int retval = 0;

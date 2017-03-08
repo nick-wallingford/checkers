@@ -6,7 +6,7 @@
 
 using namespace std;
 
-bool hashmap::contains(unsigned char d, size_t h) const {
+bool hashmap::contains(unsigned char d, uint64_t h) const {
   size_t index = h & mask;
   char i = -1;
 
@@ -22,7 +22,7 @@ bool hashmap::contains(unsigned char d, size_t h) const {
   }
 }
 
-int &hashmap::operator()(unsigned char d, size_t h) {
+int &hashmap::operator()(unsigned char d, uint64_t h) {
   size_t index = h & mask;
   char i = -1;
   for (;;) {

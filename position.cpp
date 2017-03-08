@@ -233,7 +233,7 @@ vector<position> position::moves() const {
   return captures;
 }
 
-constexpr size_t start_hash(char a) {
+constexpr uint64_t start_hash(char a) {
   return a ? (start_hash(a - 1) ^ zobrist[0][a - 1] ^ zobrist[1][32 - a]) : 0;
 }
 
@@ -305,7 +305,7 @@ void position::sanity() const {
   assert(__builtin_popcount(pieces[0] | pieces[2]) <= 12);
   assert(__builtin_popcount(pieces[1] | pieces[3]) <= 12);
 
-  size_t h = to_play == BLACK ? 0 : zobrist_player;
+  uint64_t h = to_play == BLACK ? 0 : zobrist_player;
 
   for (int i = 4; i--;) {
     for (unsigned a = pieces[i]; a;) {
