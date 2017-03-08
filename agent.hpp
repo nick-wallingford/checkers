@@ -49,8 +49,6 @@ class alphabeta : public agent {
 
 public:
   alphabeta(const heuristic &e, int depth, char side)
-      : agent(e, depth, side), cache{20}, r{std::random_device{}()} {
-    r.discard(100);
-  }
+      : agent(e, depth, side), cache{20}, r{std::random_device{}()} {}
   position get_move(const position &);
 };

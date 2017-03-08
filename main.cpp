@@ -43,7 +43,7 @@ int main() {
   e.add_evaluator(eval_centralized_kings, 5);
   e.add_evaluator(eval_trapped_kings, 10);
 
-  game_test<alphabeta, minimax, 6>(e);
+  game_test<minimax, alphabeta_cache, 8>(e);
 
   return 0;
 }
