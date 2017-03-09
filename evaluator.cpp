@@ -19,16 +19,16 @@ namespace eval {
  */
 
 int eval_black_dyke(const array<unsigned, 4> &pieces, char, int weight) {
-  int retval = __builtin_popcount(pieces[0] & 0x4223);
+  int retval = __builtin_popcount(pieces[0] & 0x44223);
   retval *= retval * weight;
-  retval /= 25;
+  retval /= 36;
   return retval;
 }
 
 int eval_white_dyke(const array<unsigned, 4> &pieces, char, int weight) {
-  int retval = __builtin_popcount(pieces[1] & 0xc4420000u);
+  int retval = __builtin_popcount(pieces[1] & 0xc4422000u);
   retval *= retval * -weight;
-  retval /= 25;
+  retval /= 36;
   return retval;
 }
 
