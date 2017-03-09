@@ -16,9 +16,9 @@ enum eval_names {
 
 #define REGISTER_ENUM(x) #x,
 static const std::array<std::string, eval_names::eval_count + 1>
-    eval_names_text{
+    eval_names_text{{
 #include "evaluator_names.hpp"
-        "invalid"};
+        "invalid"}};
 #undef REGISTER_ENUM
 
 namespace eval {
@@ -31,9 +31,9 @@ namespace eval {
 static const std::array<
     std::function<int(const std::array<unsigned, 4> &, char, int)>,
     eval_names::eval_count + 1>
-    eval_funcs{
+    eval_funcs{{
 #include "evaluator_names.hpp"
-        NULL};
+        NULL}};
 #undef REGISTER_ENUM
 
 #pragma GCC diagnostic pop
