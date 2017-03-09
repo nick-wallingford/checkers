@@ -88,7 +88,6 @@ position alphabeta_cache::get_move(const position &p) {
 }
 
 void transposition_table::sort(std::vector<position> moves, bool maximize) {
-  ++lookup_count;
   if (moves.size() <= 1)
     return;
   vector<int> score;
@@ -102,7 +101,6 @@ void transposition_table::sort(std::vector<position> moves, bool maximize) {
     for (index j{hash, mask}; j.has_next(); ++j) {
       const node &n = table[*j];
       if (hash == n.hash) {
-	++hit_count;
         if (maximize)
           best_score = max(best_score, n.score);
         else
@@ -142,9 +140,6 @@ void transposition_table::sort(std::vector<position> moves, bool maximize) {
 
   for (int s : score)
     sum -= s;
-
-  if (sum != 0)
-    cout << "error with sort\n";
 }
 
 bool transposition_table::lookup(const position &p, int depth, int &alpha,
@@ -190,8 +185,4 @@ void transposition_table::insert(const position &p, int score, char depth,
       return;
     }
   }
-}
-
-transposition_table::~transposition_table() {
-  cout << 100.0f * (float)hit_count / lookup_count << '\n';
 }

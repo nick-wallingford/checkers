@@ -32,17 +32,13 @@ class transposition_table {
     char age;
   };
 
-  size_t hit_count;
-  size_t lookup_count;
   const size_t mask;
   std::unique_ptr<node[]> table;
   char age;
 
 public:
   transposition_table(size_t size)
-      : hit_count{0}, lookup_count{0}, mask{((size_t)1 << size) - 1},
-        table{new node[mask + 1]()}, age{0} {}
-  ~transposition_table();
+      : mask{((size_t)1 << size) - 1}, table{new node[mask + 1]()}, age{0} {}
 
   bool lookup(const position &p, int depth, int &alpha, int &beta, int &score);
   void insert(const position &p, int score, char depth, node_type);
