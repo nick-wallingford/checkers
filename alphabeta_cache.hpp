@@ -1,26 +1,63 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "agent.hpp"
 
-class alphabeta_cache : public agent {
+enum node_type { pv, cut, all };
+
+class transposition_table {
+  class index {
+    size_t mask;
+    size_t i;
+    char j;
+
+  public:
+    index(uint64_t h, size_t mask) : mask{mask}, i{h & mask}, j{0} {}
+    size_t operator*() const { return i; }
+    size_t operator++() {
+      i += ++j;
+      i &= mask;
+      return i;
+    }
+    bool has_next() const { return j != 10; };
+  };
+
+  struct node {
+    uint64_t hash;
+    int score;
+    char depth;
+    char type;
+    char age;
+  };
+
+  size_t hit_count;
+  size_t lookup_count;
   const size_t mask;
+  std::unique_ptr<node[]> table;
+  char age;
 
-  std::unique_ptr<unsigned char[]> depth;
-  std::unique_ptr<size_t[]> hash;
-  std::unique_ptr<int[]> minimum;
-  std::unique_ptr<int[]> exact;
-  std::unique_ptr<int[]> maximum;
+public:
+  transposition_table(size_t size)
+      : hit_count{0}, lookup_count{0}, mask{((size_t)1 << size) - 1},
+        table{new node[mask + 1]()}, age{0} {}
+  ~transposition_table();
 
+  bool lookup(const position &p, int depth, int &alpha, int &beta, int &score);
+  void insert(const position &p, int score, char depth, node_type);
+  void operator++() { ++age; }
+  void sort(std::vector<position>, bool);
+};
+
+class alphabeta_cache : public agent {
+  transposition_table tt;
   std::default_random_engine r;
-  int eval(const position &, unsigned char, int alpha, int beta, bool maximize);
+  int eval(const position &, unsigned char, int alpha, int beta, bool maximize,
+           node_type);
 
 public:
   alphabeta_cache(const heuristic &e, int d, char side)
-      : agent(e, d, side), mask{((size_t)1 << 16) - 1},
-        depth{new unsigned char[mask + 1]()}, hash{new size_t[mask + 1]},
-        minimum{new int[mask + 1]}, exact{new int[mask + 1]},
-        maximum{new int[mask + 1]}, r{std::random_device{}()} {}
+      : agent(e, d, side), tt(16), r{std::random_device{}()} {}
   position get_move(const position &);
 };

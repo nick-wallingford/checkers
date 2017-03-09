@@ -42,9 +42,9 @@ int main() {
   e.add_evaluator(eval_white_pyramid, 20);
   e.add_evaluator(eval_black_pyramid, 20);
   e.add_evaluator(eval_centralized_kings, 5);
-  e.add_evaluator(eval_trapped_kings, 10);
+  //e.add_evaluator(eval_trapped_kings, 10);
 
-  game_test<minimax, alphabeta_cache, 8>(e);
+  game_test<alphabeta_cache, alphabeta_cache, 12>(e);
 
   return 0;
 }
