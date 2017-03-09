@@ -7,8 +7,7 @@
 using namespace std;
 
 int heuristic::operator()(const position &p) const {
-  const std::array<unsigned, 4> &pieces = p.get_board();
-  const char king_count = __builtin_popcount(pieces[2] | pieces[3]);
+  const char king_count = __builtin_popcount(p[2] | p[3]);
 
   int retval = p.piece_differential() * 10;
   retval += p.king_differential() * kingweight;
@@ -17,7 +16,7 @@ int heuristic::operator()(const position &p) const {
     retval += p.king_differential() * (6 - king_count);
 
   for (const auto &eval : evaluators)
-    retval += eval_funcs[eval.first](pieces, p.player(), eval.second);
+    retval += eval_funcs[eval.first](p, eval.second);
 
   return retval;
 }

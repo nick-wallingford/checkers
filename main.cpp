@@ -39,12 +39,10 @@ template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
 
 int main() {
   heuristic e;
-  e.add_evaluator(eval_white_pyramid, 20);
-  e.add_evaluator(eval_black_pyramid, 20);
-  e.add_evaluator(eval_centralized_kings, 5);
-  e.add_evaluator(eval_white_dyke, 10);
-  e.add_evaluator(eval_black_dyke, 10);
+  e.add_evaluator(eval_pyramid, 15);
   e.add_evaluator(eval_d_diagonal, 15);
+  e.add_evaluator(eval_dyke, 10);
+  e.add_evaluator(eval_centralized_kings, 3);
 
   game_test<alphabeta_cache, alphabeta_cache, 11>(e);
 

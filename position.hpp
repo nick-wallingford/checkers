@@ -51,7 +51,6 @@ public:
     return __builtin_popcount(pieces[2]) - __builtin_popcount(pieces[3]);
   }
 
-  const std::array<unsigned, 4> &get_board() const { return pieces; }
   std::vector<position> moves() const;
   std::uint64_t hash() const { return _hash; }
   void sanity() const
@@ -63,6 +62,7 @@ public:
 #endif
 
   char player() const { return to_play; }
+  unsigned operator[](char a) const { return pieces[(int)a]; }
 
   friend std::ostream &operator<<(std::ostream &, const position &);
 };
