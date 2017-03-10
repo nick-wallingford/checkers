@@ -44,13 +44,6 @@ public:
     return true;
   }
 
-  int piece_differential() const {
-    return __builtin_popcount(pieces[0]) - __builtin_popcount(pieces[1]);
-  }
-  int king_differential() const {
-    return __builtin_popcount(pieces[2]) - __builtin_popcount(pieces[3]);
-  }
-
   std::vector<position> moves() const;
   std::uint64_t hash() const { return _hash; }
   void sanity() const

@@ -9,11 +9,12 @@ using namespace std;
 int heuristic::operator()(const position &p) const {
   const char king_count = __builtin_popcount(p[2] | p[3]);
 
-  int retval = p.piece_differential() * 10;
-  retval += p.king_differential() * kingweight;
+  int retval = (__builtin_popcount(p[0]) - __builtin_popcount(p[1])) * 10;
+  retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) * kingweight;
 
   if (king_count < 6)
-    retval += p.king_differential() * (6 - king_count);
+    retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) *
+              (6 - king_count);
 
   for (const auto &eval : evaluators)
     retval += eval_funcs[eval.first](p, eval.second);
