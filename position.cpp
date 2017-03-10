@@ -3,6 +3,8 @@
 #include <iostream>
 #include <random>
 
+#include "util.hpp"
+
 using namespace std;
 
 constexpr unsigned square_to_piece(char square) { return 1 << (square - 1); }
@@ -169,14 +171,10 @@ vector<position> position::moves() const {
 
   for (char king = 0; king <= 2; king += 2) {
     const char mobility = king ? (UP | DOWN) : (to_play + 1);
-    for (unsigned a = pieces[to_play + king]; a;) {
-      const unsigned piece = 0x80000000u >> __builtin_clz(a);
-      const char square = 32 - __builtin_clz(a);
+    for (board_iterator it{pieces[to_play + king]}; it.valid();++it) {
+      const char square = it.square();
 
-      assert(square == piece_to_square(piece));
-      assert(piece == square_to_piece(square));
-
-      capture_moves(captures, square, piece);
+      capture_moves(captures, square, *it);
 
       if (captures.empty()) {
         for (char s : moves_regular(square, mobility)) {
@@ -191,14 +189,12 @@ vector<position> position::moves() const {
           p._hash ^= zobrist[p.to_play + king][s - 1];
           p._hash ^= zobrist[p.to_play + king][square - 1];
 
-          p.pieces[p.to_play + king] ^= piece;
+          p.pieces[p.to_play + king] ^= *it;
           p.pieces[p.to_play + king] ^= next_piece;
 
           regular.emplace_back(p);
         }
       }
-
-      a ^= piece;
     }
   }
 
@@ -206,24 +202,19 @@ vector<position> position::moves() const {
     captures = std::move(regular);
 
   for (position &p : captures) {
-    for (unsigned a = p.pieces[0] & 0xf0000000; a;) {
-      const char square = 32 - __builtin_clz(a);
-      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+    for (board_iterator it{p.pieces[0] & 0xf0000000}; it.valid();++it) {
+      const char square = piece_to_square(*it);
 
       p._hash ^= zobrist[0][square - 1] ^ zobrist[2][square - 1];
-      p.pieces[0] ^= piece;
-      p.pieces[2] ^= piece;
-      a ^= piece;
+      p.pieces[0] ^= *it;
+      p.pieces[2] ^= *it;
     }
-    for (unsigned a = p.pieces[1] & 0x0000000f; a;) {
-      const char square = 32 - __builtin_clz(a);
-      const unsigned piece = 0x80000000u >> __builtin_clz(a);
+    for (board_iterator it{p.pieces[1] & 0x0000000f}; it.valid();++it) {
+      const char square = it.square();
 
       p._hash ^= zobrist[1][square - 1] ^ zobrist[3][square - 1];
-      p.pieces[1] ^= piece;
-      p.pieces[3] ^= piece;
-
-      a ^= piece;
+      p.pieces[1] ^= *it;
+      p.pieces[3] ^= *it;
     }
 
     p._hash ^= zobrist_player;
@@ -308,14 +299,12 @@ void position::sanity() const {
   uint64_t h = to_play == BLACK ? 0 : zobrist_player;
 
   for (int i = 4; i--;) {
-    for (unsigned a = pieces[i]; a;) {
-      const char square = 32 - __builtin_clz(a);
-      const unsigned piece = 0x80000000u >> __builtin_clz(a);
-      assert(piece == square_to_piece(square));
-      assert(pieces[i] & piece);
+    for (board_iterator it{pieces[i]}; it.valid(); ++it) {
+      const char square = it.square();
+      assert(*it == square_to_piece(square));
+      assert(pieces[i] & *it);
 
       h ^= zobrist[i][(int)square - 1];
-      a ^= piece;
     }
   }
 
