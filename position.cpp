@@ -62,6 +62,12 @@ static const std::array<std::array<uint64_t, 32>, 4> zobrist{
        0x1e0d5afe2323dffe, 0xbece13ddbd419395, 0x5166b79643aa7ea4,
        0xdc5052f721e7c12c, 0x4e2159eaf7bbb0ce}}}};
 
+static inline uint64_t zob(unsigned piece, char king, char player) {
+  assert(king == 0 || king == 2);
+  assert(player == 0 || player == 1);
+  return zobrist[king + player][__builtin_clz(piece)];
+}
+
 static const array<char, 4> moves_regular(char square, char mobility) {
   array<char, 4> retval{
       {char(square - 4), char(square - 3), char(square + 4), char(square + 5)}};
@@ -143,17 +149,16 @@ bool position::capture_moves(vector<position> &list, const char square,
     const char capturing_king = (piece & pieces[to_play]) ? 0 : 2;
     assert(piece & pieces[to_play + capturing_king]);
 
-    const char captured_king =
-        (captured_piece & pieces[WHITE - to_play]) ? 0 : 2;
-    assert(captured_piece & pieces[WHITE - to_play + captured_king]);
+    const char captured_king = (captured_piece & pieces[to_play ^ 1]) ? 0 : 2;
+    assert(captured_piece & pieces[(1 ^ to_play) + captured_king]);
 
-    p._hash ^= zobrist[p.to_play + capturing_king][square - 1];
-    p._hash ^= zobrist[p.to_play + capturing_king][m - 1];
-    p._hash ^= zobrist[WHITE - p.to_play + captured_king][captured_square - 1];
+    p._hash ^= zob(piece, capturing_king, p.to_play);
+    p._hash ^= zob(capturing_piece, capturing_king, p.to_play);
+    p._hash ^= zob(captured_piece, captured_king, 1 ^ p.to_play);
 
     p.pieces[p.to_play + capturing_king] ^= piece;
     p.pieces[p.to_play + capturing_king] ^= capturing_piece;
-    p.pieces[WHITE - p.to_play + captured_king] ^= captured_piece;
+    p.pieces[(1 ^ to_play) + captured_king] ^= captured_piece;
 
     capture = true;
     if (!p.capture_moves(list, m, capturing_piece)) {
@@ -171,7 +176,7 @@ vector<position> position::moves() const {
 
   for (char king = 0; king <= 2; king += 2) {
     const char mobility = king ? (UP | DOWN) : (to_play + 1);
-    for (board_iterator it{pieces[to_play + king]}; it.valid();++it) {
+    for (board_iterator it{pieces[to_play + king]}; it.valid(); ++it) {
       const char square = it.square();
 
       capture_moves(captures, square, *it);
@@ -184,10 +189,11 @@ vector<position> position::moves() const {
             continue;
 
           position p{*this};
+
           const unsigned next_piece = square_to_piece(s);
 
-          p._hash ^= zobrist[p.to_play + king][s - 1];
-          p._hash ^= zobrist[p.to_play + king][square - 1];
+          p._hash ^= zob(next_piece, king, p.to_play);
+          p._hash ^= zob(*it, king, p.to_play);
 
           p.pieces[p.to_play + king] ^= *it;
           p.pieces[p.to_play + king] ^= next_piece;
@@ -202,30 +208,26 @@ vector<position> position::moves() const {
     captures = std::move(regular);
 
   for (position &p : captures) {
-    for (board_iterator it{p.pieces[0] & 0xf0000000}; it.valid();++it) {
-      const char square = piece_to_square(*it);
-
-      p._hash ^= zobrist[0][square - 1] ^ zobrist[2][square - 1];
+    for (board_iterator it{p.pieces[0] & 0xf0000000}; it.valid(); ++it) {
+      p._hash ^= zob(*it, 0, 0) ^ zob(*it, 2, 0);
       p.pieces[0] ^= *it;
       p.pieces[2] ^= *it;
     }
-    for (board_iterator it{p.pieces[1] & 0x0000000f}; it.valid();++it) {
-      const char square = it.square();
-
-      p._hash ^= zobrist[1][square - 1] ^ zobrist[3][square - 1];
+    for (board_iterator it{p.pieces[1] & 0x0000000f}; it.valid(); ++it) {
+      p._hash ^= zob(*it, 0, 1) ^ zob(*it, 2, 1);
       p.pieces[1] ^= *it;
       p.pieces[3] ^= *it;
     }
 
     p._hash ^= zobrist_player;
-    p.to_play = 1 - p.to_play;
+    p.to_play ^= 1;
   }
 
   return captures;
 }
 
 constexpr uint64_t start_hash(char a) {
-  return a ? (start_hash(a - 1) ^ zobrist[0][a - 1] ^ zobrist[1][32 - a]) : 0;
+  return a ? (start_hash(a - 1) ^ zobrist[1][a - 1] ^ zobrist[0][32 - a]) : 0;
 }
 
 void get_captured_square_test() {
@@ -304,7 +306,7 @@ void position::sanity() const {
       assert(*it == square_to_piece(square));
       assert(pieces[i] & *it);
 
-      h ^= zobrist[i][(int)square - 1];
+      h ^= zob(*it, i & 2, i & 1);
     }
   }
 
