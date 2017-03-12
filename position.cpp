@@ -7,14 +7,6 @@
 
 using namespace std;
 
-constexpr unsigned square_to_piece(char square) { return 1 << (square - 1); }
-constexpr char piece_to_square(unsigned piece) {
-  return 32 - __builtin_clz(piece);
-}
-
-#define UP 2
-#define DOWN 1
-
 static const uint64_t zobrist_player = 0xedf5d879fc98a912;
 static const std::array<std::array<uint64_t, 32>, 4> zobrist{
     {{{0x40eab28baa02a864, 0x874a7dca277a4fb0, 0x581ea36751b3d470,
@@ -62,106 +54,39 @@ static const std::array<std::array<uint64_t, 32>, 4> zobrist{
        0x1e0d5afe2323dffe, 0xbece13ddbd419395, 0x5166b79643aa7ea4,
        0xdc5052f721e7c12c, 0x4e2159eaf7bbb0ce}}}};
 
-static inline uint64_t zob(unsigned piece, char king, char player) {
-  assert(king == 0 || king == 2);
-  assert(player == 0 || player == 1);
-  return zobrist[king + player][__builtin_clz(piece)];
+static inline uint64_t zob(unsigned piece, bool player, bool king) {
+  return zobrist[2 * king + player][__builtin_clz(piece)];
 }
 
-static const array<char, 4> moves_regular(char square, char mobility) {
-  array<char, 4> retval{
-      {char(square - 4), char(square - 3), char(square + 4), char(square + 5)}};
-  if ((square - 1) & 4)
-    for (char &a : retval)
-      --a;
-  const int mask = square & 7;
-
-  if (square <= 4 || !(mobility & UP))
-    retval[0] = retval[1] = 0;
-  if (square >= 29 || !(mobility & DOWN))
-    retval[2] = retval[3] = 0;
-
-  if (mask == 4)
-    retval[1] = retval[3] = 0;
-  if (mask == 5)
-    retval[0] = retval[2] = 0;
-
-#ifndef NDEBUG
-  for (char s : retval)
-    assert(s < 33);
-#endif
-
-  return retval;
-}
-
-static const array<char, 4> moves_capture(char square, char mobility) {
-  array<char, 4> retval{
-      {char(square - 9), char(square - 7), char(square + 7), char(square + 9)}};
-  const char mask = square & 7;
-
-  if (square <= 8 || !(mobility & UP))
-    retval[0] = retval[1] = 0;
-  if (square >= 25 || !(mobility & DOWN))
-    retval[2] = retval[3] = 0;
-
-  if (mask == 4 || mask == 0)
-    retval[1] = retval[3] = 0;
-  if (mask == 5 || mask == 1)
-    retval[0] = retval[2] = 0;
-
-#ifndef NDEBUG
-  for (char s : retval)
-    assert(s < 33 && s >= 0);
-#endif
-
-  return retval;
-}
-
-static char get_captured_square(char now, char later) {
-  const char offset = 1 - (((now - 1) >> 2) & 1);
-  return (now + later) / 2 + offset;
-}
-
-bool position::capture_moves(vector<position> &list, const char square,
-                             const unsigned piece) const {
+bool position::capture_moves(vector<position> &list, const unsigned piece,
+                             const char mobility) const {
   bool capture = false;
-  array<char, 4> moves = moves_capture(
-      square, (piece & pieces[to_play]) ? (to_play + 1) : (UP | DOWN));
   assert(piece & mine());
 
-  for (const char m : moves) {
-    assert(m <= 32);
-    if (!m) // if the move is off the board, skip
+  for (capture_iterator it{piece, mobility}; it.valid(); ++it) {
+    if (all() & it.capturing()) // if there's a piece where we're going, skip
       continue;
-
-    const unsigned capturing_piece = square_to_piece(m);
-    assert(__builtin_popcount(capturing_piece) <= 1);
-    if (all() & capturing_piece) // if there's a piece where we're going, skip
-      continue;
-
-    const char captured_square = get_captured_square(square, m);
-    const unsigned captured_piece = square_to_piece(captured_square);
-    if (!(theirs() & captured_piece))
+    if (!(theirs() & it.captured()))
       continue; // if we're not capturing an enemy piece, skip
 
     position p{*this};
 
-    const char capturing_king = (piece & pieces[to_play]) ? 0 : 2;
-    assert(piece & pieces[to_play + capturing_king]);
+    const bool capturing_king = mobility == (UP | DOWN);
+    const bool captured_king = it.captured() & p(to_play ^ 1, 1);
 
-    const char captured_king = (captured_piece & pieces[to_play ^ 1]) ? 0 : 2;
-    assert(captured_piece & pieces[(1 ^ to_play) + captured_king]);
+    assert(p(p.to_play, capturing_king) & piece);
+    assert(p(1 ^ p.to_play, captured_king) & it.captured());
 
-    p._hash ^= zob(piece, capturing_king, p.to_play);
-    p._hash ^= zob(capturing_piece, capturing_king, p.to_play);
-    p._hash ^= zob(captured_piece, captured_king, 1 ^ p.to_play);
+    p._hash ^= zob(piece, p.to_play, capturing_king);
+    p._hash ^= zob(it.capturing(), p.to_play, capturing_king);
+    p._hash ^= zob(it.captured(), 1 ^ p.to_play, captured_king);
 
-    p.pieces[p.to_play + capturing_king] ^= piece;
-    p.pieces[p.to_play + capturing_king] ^= capturing_piece;
-    p.pieces[(1 ^ to_play) + captured_king] ^= captured_piece;
+    p(p.to_play, capturing_king) ^= piece;
+    p(p.to_play, capturing_king) ^= it.capturing();
+    p(1 ^ to_play, captured_king) ^= it.captured();
 
     capture = true;
-    if (!p.capture_moves(list, m, capturing_piece)) {
+    if (!p.capture_moves(list, it.capturing(), mobility)) {
       list.emplace_back(p);
     }
   }
@@ -174,29 +99,26 @@ vector<position> position::moves() const {
   vector<position> captures;
   vector<position> regular;
 
-  for (char king = 0; king <= 2; king += 2) {
+  for (char king = 2; king--;) {
     const char mobility = king ? (UP | DOWN) : (to_play + 1);
-    for (board_iterator it{pieces[to_play + king]}; it.valid(); ++it) {
-      const char square = it.square();
+    for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it) {
+      assert(*it & mine());
 
-      capture_moves(captures, square, *it);
+      capture_moves(captures, *it, mobility);
 
       if (captures.empty()) {
-        for (char s : moves_regular(square, mobility)) {
-          if (!s)
-            continue;
-          if (square_to_piece(s) & all())
+        for (board_iterator move{get_moves(*it, mobility)}; move.valid();
+             ++move) {
+          if (*move & all())
             continue;
 
           position p{*this};
 
-          const unsigned next_piece = square_to_piece(s);
+          p._hash ^= zob(*move, p.to_play, king);
+          p._hash ^= zob(*it, p.to_play, king);
 
-          p._hash ^= zob(next_piece, king, p.to_play);
-          p._hash ^= zob(*it, king, p.to_play);
-
-          p.pieces[p.to_play + king] ^= *it;
-          p.pieces[p.to_play + king] ^= next_piece;
+          p(p.to_play, king) ^= *it;
+          p(p.to_play, king) ^= *move;
 
           regular.emplace_back(p);
         }
@@ -208,17 +130,16 @@ vector<position> position::moves() const {
     captures = std::move(regular);
 
   for (position &p : captures) {
-    for (board_iterator it{p.pieces[0] & 0xf0000000}; it.valid(); ++it) {
-      p._hash ^= zob(*it, 0, 0) ^ zob(*it, 2, 0);
-      p.pieces[0] ^= *it;
-      p.pieces[2] ^= *it;
+    for (board_iterator it{p[0] & 0xf0000000}; it.valid(); ++it) {
+      p._hash ^= zob(*it, 0, 0) ^ zob(*it, 0, 1);
+      p[0] ^= *it;
+      p[2] ^= *it;
     }
-    for (board_iterator it{p.pieces[1] & 0x0000000f}; it.valid(); ++it) {
-      p._hash ^= zob(*it, 0, 1) ^ zob(*it, 2, 1);
-      p.pieces[1] ^= *it;
-      p.pieces[3] ^= *it;
+    for (board_iterator it{p[1] & 0x0000000f}; it.valid(); ++it) {
+      p._hash ^= zob(*it, 1, 0) ^ zob(*it, 1, 1);
+      p[1] ^= *it;
+      p[3] ^= *it;
     }
-
     p._hash ^= zobrist_player;
     p.to_play ^= 1;
   }
@@ -228,17 +149,6 @@ vector<position> position::moves() const {
 
 constexpr uint64_t start_hash(char a) {
   return a ? (start_hash(a - 1) ^ zobrist[1][a - 1] ^ zobrist[0][32 - a]) : 0;
-}
-
-void get_captured_square_test() {
-  assert(get_captured_square(10, 19) == 15);
-  assert(get_captured_square(10, 17) == 14);
-  assert(get_captured_square(10, 1) == 6);
-  assert(get_captured_square(10, 3) == 7);
-  assert(get_captured_square(14, 5) == 9);
-  assert(get_captured_square(14, 7) == 10);
-  assert(get_captured_square(14, 21) == 17);
-  assert(get_captured_square(14, 23) == 18);
 }
 
 position::position()
@@ -258,33 +168,27 @@ ostream &operator<<(ostream &o, const position &p) {
     o << white << "To play: White" << color_reset << '\n';
   else
     o << black << "To play: Black" << color_reset << '\n';
-  for (char i = 0; i < 8; i++) {
-    if (!(i & 1))
+  for (unsigned piece = 1; piece; piece <<= 1) {
+    if (piece & 0x0f0f0f0f)
       o << null_square;
 
-    for (int j = 0; j < 4; j++) {
-      const char square = 1 + i * 4 + j;
-      const unsigned piece = square_to_piece(square);
-      if (piece & p.pieces[0])
-        o << black << regular;
-      else if (piece & p.pieces[1])
-        o << white << regular;
-      else if (piece & p.pieces[2])
-        o << black << king;
-      else if (piece & p.pieces[3])
-        o << white << king;
-      else
-        o << black << ' ';
+    if (piece & p[0])
+      o << black << regular;
+    else if (piece & p[1])
+      o << white << regular;
+    else if (piece & p[2])
+      o << black << king;
+    else if (piece & p[3])
+      o << white << king;
+    else
+      o << black << ' ';
 
-      if (j != 3)
-        o << null_square;
-    }
-
-    if (i & 1)
+    if (piece & 0xf0f0f0f0)
       o << null_square;
-    o << color_reset << '\n';
+    if (piece & 0x88888888)
+      o << color_reset << '\n';
   }
-
+  o << color_reset;
   return o;
 }
 
@@ -302,11 +206,9 @@ void position::sanity() const {
 
   for (int i = 4; i--;) {
     for (board_iterator it{pieces[i]}; it.valid(); ++it) {
-      const char square = it.square();
-      assert(*it == square_to_piece(square));
       assert(pieces[i] & *it);
 
-      h ^= zob(*it, i & 2, i & 1);
+      h ^= zob(*it, i & 1, i & 2);
     }
   }
 

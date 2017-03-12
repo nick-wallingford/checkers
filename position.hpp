@@ -25,7 +25,7 @@ private:
    */
   char to_play;
 
-  bool capture_moves(std::vector<position> &, const char, const unsigned) const;
+  bool capture_moves(std::vector<position> &, const unsigned, const char) const;
   unsigned theirs() const {
     return pieces[WHITE - to_play] | pieces[WHITE - to_play + 2];
   }
@@ -55,7 +55,14 @@ public:
 #endif
 
   char player() const { return to_play; }
-  unsigned operator[](char a) const { return pieces[(int)a]; }
+  unsigned operator[](int a) const { return pieces[a]; }
+  unsigned &operator[](int a) { return pieces[a]; }
+  unsigned operator()(bool player, bool king) const {
+    return pieces[player + 2 * king];
+  }
+  unsigned &operator()(bool player, bool king) {
+    return pieces[player + 2 * king];
+  }
 
   friend std::ostream &operator<<(std::ostream &, const position &);
 };
