@@ -45,3 +45,11 @@ void heuristic::mutate() {
       break;
     }
 }
+
+std::ostream &operator<<(std::ostream& o,const heuristic &h) {
+  o << "{(score:" << h.score << "),(kingweight:" << h.kingweight << ')';
+  for(pair<eval_names,int> e : h.evaluators)
+    o << ",(" << eval_names_text[e.first] << ',' << e.second << ')';
+  o << '}';
+  return o;
+}

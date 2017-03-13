@@ -1,18 +1,23 @@
 #include <array>
 #include <iostream>
-#include <random>
-#include <unordered_map>
 #include <vector>
 
 #include "alphabeta_pv.hpp"
-#include "alphabeta_cache.hpp"
 #include "heuristic.hpp"
 #include "position.hpp"
+#include "trainer.hpp"
 #include "util.hpp"
 
 using namespace std;
 
-template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
+template <class S, class T, int depth = 8> char game_test() {
+  heuristic e;
+  e.add_evaluator(eval_pyramid, 15);
+  e.add_evaluator(eval_d_diagonal, 15);
+  e.add_evaluator(eval_dyke, 10);
+  e.add_evaluator(eval_centralized_kings, 3);
+  e.add_evaluator(eval_trapped_kings, 5);
+
   position p;
   S black{e, depth, BLACK};
   T white{e, depth, WHITE};
@@ -39,13 +44,23 @@ template <class S, class T, int depth = 8> char game_test(const heuristic &e) {
 
 int main() {
   heuristic e;
-  e.add_evaluator(eval_pyramid, 15);
-  e.add_evaluator(eval_d_diagonal, 15);
-  e.add_evaluator(eval_dyke, 10);
-  e.add_evaluator(eval_centralized_kings, 3);
-  e.add_evaluator(eval_trapped_kings, 5);
 
-  game_test<alphabeta_pv, alphabeta, 10>(e);
+  e.add_evaluator(eval_trapped_kings,11);
+  e.add_evaluator(eval_pyramid,12);
+  e.add_evaluator(eval_centralized_kings,9);
+  e.add_evaluator(eval_dyke,10);
+  e.add_evaluator(eval_a_diagonal,10);
+  e.add_evaluator(eval_b_diagonal,10);
+  e.add_evaluator(eval_c_diagonal,11);
+  e.add_evaluator(eval_d_diagonal,9);
+  e.add_evaluator(eval_e_diagonal,12);
+  e.add_evaluator(eval_f_diagonal,10);
+  e.add_evaluator(eval_g_diagonal,9);
 
+  trainer t{{e}, 10, 10};
+  for (;;) {
+    t();
+    cout << '\n' << t << endl;
+  }
   return 0;
 }
