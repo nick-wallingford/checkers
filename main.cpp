@@ -1,6 +1,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 #include "alphabeta_pv.hpp"
 #include "heuristic.hpp"
@@ -46,21 +47,22 @@ int main() {
   heuristic e;
 
   e.add_evaluator(eval_trapped_kings,11);
-  e.add_evaluator(eval_pyramid,12);
+  e.add_evaluator(eval_pyramid,13);
   e.add_evaluator(eval_centralized_kings,9);
-  e.add_evaluator(eval_dyke,10);
+  e.add_evaluator(eval_dyke,11);
   e.add_evaluator(eval_a_diagonal,10);
-  e.add_evaluator(eval_b_diagonal,10);
-  e.add_evaluator(eval_c_diagonal,11);
+  e.add_evaluator(eval_b_diagonal,11);
+  e.add_evaluator(eval_c_diagonal,10);
   e.add_evaluator(eval_d_diagonal,9);
-  e.add_evaluator(eval_e_diagonal,12);
+  e.add_evaluator(eval_e_diagonal,14);
   e.add_evaluator(eval_f_diagonal,10);
-  e.add_evaluator(eval_g_diagonal,9);
+  e.add_evaluator(eval_g_diagonal,8);
 
   trainer t{{e}, 10, 10};
   for (;;) {
     t();
-    cout << '\n' << t << endl;
+    ofstream o{"training_data.txt",ios_base::app};
+    o << '\n' << t << endl;
   }
   return 0;
 }
