@@ -36,6 +36,7 @@ int minimax::maximize(const position &p, int depth) const {
     else
       return -e(p);
   }
+
   int best_score = -inf;
 
   for (const position &next : p.moves()) {
