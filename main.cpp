@@ -43,8 +43,9 @@ int main() {
   e.add_evaluator(eval_d_diagonal, 15);
   e.add_evaluator(eval_dyke, 10);
   e.add_evaluator(eval_centralized_kings, 3);
+  e.add_evaluator(eval_trapped_kings, 5);
 
-  game_test<alphabeta_cache, alphabeta_cache, 11>(e);
+  game_test<alphabeta_cache, alphabeta_cache, 10>(e);
 
   return 0;
 }
