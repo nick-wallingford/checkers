@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <random>
 
 #include "agent.hpp"
 
@@ -13,6 +14,7 @@ class alphabeta_pv : public agent {
   std::unique_ptr<uint64_t[]> pv_min;
   size_t count_max;
   size_t count_min;
+  std::ranlux24 r{std::random_device{}()};
 
   int eval(const position &, unsigned char depth, int alpha, int beta,
            bool maximize);

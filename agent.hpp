@@ -32,11 +32,10 @@ public:
 };
 
 class alphabeta : public agent {
-  std::default_random_engine r;
+  std::ranlux24 r{std::random_device{}()};
   int eval(const position &, int, int alpha, int beta);
 
 public:
-  alphabeta(const heuristic &e, int depth, char side)
-      : agent(e, depth, side), r{std::random_device{}()} {}
+  alphabeta(const heuristic &e, int depth, char side) : agent(e, depth, side) {}
   position get_move(const position &);
 };

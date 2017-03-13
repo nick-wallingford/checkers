@@ -52,39 +52,33 @@ int alphabeta_cache::eval(const position &p, unsigned char d, int alpha,
 }
 
 position alphabeta_cache::get_move(const position &p) {
-  const vector<position> moves = p.moves();
+  vector<position> moves = p.moves();
   if (moves.size() == 1)
     return moves[0];
   else if (moves.empty())
     throw resign();
 
-  vector<position> candidates;
-
   cout << (side == BLACK ? e(p) : -e(p)) << ' ' << flush;
   ++tt;
 
-  for (int i = 1; i < depth; i++) {
+  for (int i = 1; i < depth; i++)
     eval(p, i, -inf, inf, true, pv);
-    tt.sort(moves, true);
-  }
+  tt.sort(moves, true);
 
   int best_score = -inf;
+  position best_position = moves.front();
+
   for (const position &next : moves) {
     const int score = eval(next, depth, best_score, inf, false,
                            best_score == -inf ? pv : cut);
     if (score > best_score) {
-      candidates.clear();
-      candidates.push_back(next);
       best_score = score;
-    } else if (score == best_score) {
-      candidates.push_back(next);
+      best_position = next;
     }
   }
 
-  cout << best_score << ' ' << candidates.size() << endl;
-  const int ret =
-      uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);
-  return candidates[ret];
+  cout << best_score << endl;
+  return best_position;
 }
 
 void transposition_table::sort(std::vector<position> moves, bool maximize) {

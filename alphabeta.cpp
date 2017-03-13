@@ -38,30 +38,28 @@ int alphabeta::eval(const position &p, int d, int alpha, int beta) {
 }
 
 position alphabeta::get_move(const position &p) {
-  const vector<position> moves = p.moves();
+  vector<position> moves = p.moves();
   if (moves.size() == 1)
     return moves[0];
   else if (moves.empty())
     throw resign();
 
-  vector<position> candidates;
+  for (int i = 0; i + 1 < (int)moves.size(); i++)
+    swap(moves[i],
+         moves[uniform_int_distribution<int>{i, (int)moves.size() - 1}(r)]);
+
   int best_score = -inf;
+  position best_position = moves.front();
   cout << (side == BLACK ? e(p) : -e(p)) << ' ' << flush;
 
   for (const position &next : moves) {
     const int score = -eval(next, depth, -inf, -best_score);
     if (score > best_score) {
-      candidates.clear();
-      candidates.push_back(next);
       best_score = score;
-    } else if (score == best_score) {
-      candidates.push_back(next);
+      best_position = next;
     }
   }
 
-  cout << best_score << ' ' << candidates.size() << endl;
-
-  const int ret =
-      uniform_int_distribution<int>{0, (int)candidates.size() - 1}(r);
-  return candidates[ret];
+  cout << best_score << endl;
+  return best_position;
 }

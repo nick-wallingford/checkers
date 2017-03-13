@@ -45,7 +45,7 @@ int main() {
   e.add_evaluator(eval_centralized_kings, 3);
   e.add_evaluator(eval_trapped_kings, 5);
 
-  game_test<alphabeta_pv, alphabeta_pv, 10>(e);
+  game_test<alphabeta_pv, alphabeta, 10>(e);
 
   return 0;
 }

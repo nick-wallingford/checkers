@@ -48,12 +48,11 @@ public:
 
 class alphabeta_cache : public agent {
   transposition_table tt;
-  std::default_random_engine r;
   int eval(const position &, unsigned char, int alpha, int beta, bool maximize,
            node_type);
 
 public:
   alphabeta_cache(const heuristic &e, int d, char side)
-      : agent(e, d, side), tt(16), r{std::random_device{}()} {}
+      : agent(e, d, side), tt(16) {}
   position get_move(const position &);
 };
