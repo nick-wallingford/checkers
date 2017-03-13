@@ -31,7 +31,7 @@ static inline unsigned get_moves(unsigned piece, char mobility) {
   if (piece & 0xe0e0e0e0u) {
     retval |= piece >> 5;
     retval |= piece << 3;
-  } else if (piece & 0x7070700u) {
+  } else if (piece & 0x07070707u) {
     retval |= piece >> 3;
     retval |= piece << 5;
   }
@@ -47,9 +47,9 @@ class capture_iterator {
 public:
   capture_iterator(unsigned piece, char mobility)
       : capturing_board{get_jumps(piece, mobility)},
-        capturing_piece{0x80000000 >> __builtin_clz(capturing_board)},
-        captured_board{get_moves(piece, mobility) & 0x07e7e7e0},
-        captured_piece{0x80000000 >> __builtin_clz(captured_board)} {}
+        capturing_piece{0x80000000u >> __builtin_clz(capturing_board)},
+        captured_board{get_moves(piece, mobility) & 0x07e7e7e0u},
+        captured_piece{0x80000000u >> __builtin_clz(captured_board)} {}
   bool valid() const { return capturing_board; }
   void operator++() {
     capturing_board ^= capturing_piece;

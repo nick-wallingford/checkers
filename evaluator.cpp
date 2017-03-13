@@ -45,7 +45,7 @@ namespace eval {
  */
 
 int eval_dyke(const position &p, int weight) {
-  int black = __builtin_popcount(p[0] & 0x44223);
+  int black = __builtin_popcount(p[0] & 0x44223u);
   black *= black;
 
   int white = __builtin_popcount(p[1] & 0xc4422000u);
@@ -89,7 +89,7 @@ int eval_d_diagonal(const position &p, int weight) {
 }
 
 int eval_pyramid(const position &p, int weight) {
-  int black = __builtin_popcount(p[0] & 0x267);
+  int black = __builtin_popcount(p[0] & 0x267u);
   black *= black;
 
   int white = __builtin_popcount(p[1] & 0xe6400000u);
@@ -110,49 +110,49 @@ int eval_trapped_kings(const position &p, int weight) {
     // white's turn.
 
     // white kings in bottom left
-    for (board_iterator it{p[3] & 0x73311000}; it.valid(); ++it)
+    for (board_iterator it{p[3] & 0x73311000u}; it.valid(); ++it)
       if ((p[0] | p[2]) & (*it >> 8 | *it << 1))
         retval++;
       // trapped in the corner
-      else if (*it == 0x10000000 && (p[0] | p[2]) & 0x200000)
+      else if (*it == 0x10000000u && (p[0] | p[2]) & 0x200000u)
         retval++;
 
     // white kings in top right
-    for (board_iterator it{p[3] & 0x88cce}; it.valid(); ++it)
+    for (board_iterator it{p[3] & 0x88cceu}; it.valid(); ++it)
       if (p[2] & (*it << 8 | *it >> 1))
         retval++;
       // trapped in the corner
-      else if (*it == 0x4 && (p[0] & 0x4) | (p[2] & 0x400))
+      else if (*it == 0x4u && (p[0] & 0x4u) | (p[2] & 0x400u))
         retval++;
 
     // black kings in 13,21,22,29,30,31
-    for (board_iterator it{p[2] & 0x70301000}; it.valid(); ++it)
-      if (0xe070301 & p[3] & (*it << 5 | *it >> 3 | *it >> 12 | *it >> 13))
+    for (board_iterator it{p[2] & 0x70301000u}; it.valid(); ++it)
+      if (0xe070301u & p[3] & (*it << 5 | *it >> 3 | *it >> 12 | *it >> 13))
         retval--;
-      else if (*it == 0x10000000 && p[3] & 0x20000)
+      else if (*it == 0x10000000u && p[3] & 0x20000u)
         retval--;
 
     // black kings in 17,25,26
-    for (board_iterator it{p[2] & 0x03010000}; it.valid(); ++it)
+    for (board_iterator it{p[2] & 0x03010000u}; it.valid(); ++it)
       if (p[3] & (*it << 6 | *it >> 2 | *it >> 11 | *it >> 12))
         retval--;
 
     // black kings in 2,3,4,11,12,20
-    for (board_iterator it{p[2] & 0x80c0e}; it.valid(); ++it)
+    for (board_iterator it{p[2] & 0x80c0eu}; it.valid(); ++it)
       // trapped vertically
-      if (0x80c0e000 & (p[3] | p[1]) & (*it << 12 | *it << 13))
+      if (0x80c0e000u & (p[3] | p[1]) & (*it << 12 | *it << 13))
         retval--;
       // trapped horizontally
       else if (p[3] & (*it << 3 | *it >> 5))
         retval--;
       // trapped in the corner
-      else if (*it == 0x8 && (p[1] | p[3]) & 0x4000)
+      else if (*it == 0x8u && (p[1] | p[3]) & 0x4000u)
         retval--;
 
     // black kings in 7,8,16
-    for (board_iterator it{p[2] & 0x80c0}; it.valid(); ++it)
+    for (board_iterator it{p[2] & 0x80c0u}; it.valid(); ++it)
       // trapped vertically
-      if (0x0c0e0000 & (p[3] | p[1]) & (*it << 11 | *it << 12))
+      if (0x0c0e0000u & (p[3] | p[1]) & (*it << 11 | *it << 12))
         retval--;
       // trapped horizontally
       else if (p[3] & (*it << 2 | *it >> 6))
@@ -161,53 +161,53 @@ int eval_trapped_kings(const position &p, int weight) {
     // black's turn.
 
     // black kings in bottom left
-    for (board_iterator it{p[2] & 0x73311000}; it.valid(); ++it)
+    for (board_iterator it{p[2] & 0x73311000u}; it.valid(); ++it)
       if (p[3] & (*it >> 8 | *it << 1))
         retval--;
       // trapped in the corner
-      else if (p[2] == 0x10000000 && (p[1] & 0x20000000) | (p[3] & 0x200000))
+      else if (p[2] == 0x10000000u && (p[1] & 0x20000000u) | (p[3] & 0x200000u))
         retval--;
 
     // black kings in top right
-    for (board_iterator it{p[2] & 0x88cce}; it.valid(); ++it)
+    for (board_iterator it{p[2] & 0x88cceu}; it.valid(); ++it)
       if ((p[3] | p[1]) & (*it << 8 | *it >> 1))
         retval--;
       // trapped in the corner
-      else if (p[2] == 0x8 && (p[1] | p[3]) & 0x400)
+      else if (p[2] == 0x8u && (p[1] | p[3]) & 0x400u)
         retval--;
 
     // white kings in 13,21,22,29,30,31
-    for (board_iterator it{p[3] & 0x70301000}; it.valid(); ++it)
+    for (board_iterator it{p[3] & 0x70301000u}; it.valid(); ++it)
       // trapped vertically
-      if (0x70301 & (p[0] | p[2]) & (*it >> 13 | *it >> 12))
+      if (0x70301u & (p[0] | p[2]) & (*it >> 13 | *it >> 12))
         retval++;
       // trapped horizontally
       else if (p[2] & (*it << 5 | *it >> 3))
         retval++;
       // trapped in the corner
-      else if (*it == 0x10000000 && (p[1] | p[3]) & 0x20000)
+      else if (*it == 0x10000000u && (p[1] | p[3]) & 0x20000u)
         retval++;
 
     // white kings in 17,25,26
-    for (board_iterator it{p[3] & 0x3010000}; it.valid(); ++it)
+    for (board_iterator it{p[3] & 0x3010000u}; it.valid(); ++it)
       // trapped vertically
-      if (0x7030 & (p[0] | p[2]) & (*it >> 12 | *it >> 11))
+      if (0x7030u & (p[0] | p[2]) & (*it >> 12 | *it >> 11))
         retval++;
       // trapped horizontally
       else if (p[2] & (*it << 6 | *it >> 2))
         retval++;
 
     // white kings in 2,3,4,11,12,20
-    for (board_iterator it{p[3] & 0x80c0e}; it.valid(); ++it)
+    for (board_iterator it{p[3] & 0x80c0eu}; it.valid(); ++it)
       if (0x80c0e070u & p[2] & (*it << 13 | *it << 12 | *it << 3 | *it >> 5))
         retval++;
       // trapped in the corner
-      else if (*it == 0x8 && p[3] & 0x4000)
+      else if (*it == 0x8u && p[3] & 0x4000u)
         retval++;
 
     // white kings in 7,8,16
-    for (board_iterator it{p[3] & 0x80c0}; it.valid(); ++it)
-      if (0xc0e0303 & p[2] & (*it << 12 | *it << 11 | *it << 2 | *it >> 6))
+    for (board_iterator it{p[3] & 0x80c0u}; it.valid(); ++it)
+      if (0xc0e0303u & p[2] & (*it << 12 | *it << 11 | *it << 2 | *it >> 6))
         retval++;
   }
   return retval * weight;

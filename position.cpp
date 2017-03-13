@@ -130,12 +130,12 @@ vector<position> position::moves() const {
     captures = std::move(regular);
 
   for (position &p : captures) {
-    for (board_iterator it{p[0] & 0xf0000000}; it.valid(); ++it) {
+    for (board_iterator it{p[0] & 0xf0000000u}; it.valid(); ++it) {
       p._hash ^= zob(*it, 0, 0) ^ zob(*it, 0, 1);
       p[0] ^= *it;
       p[2] ^= *it;
     }
-    for (board_iterator it{p[1] & 0x0000000f}; it.valid(); ++it) {
+    for (board_iterator it{p[1] & 0x0000000fu}; it.valid(); ++it) {
       p._hash ^= zob(*it, 1, 0) ^ zob(*it, 1, 1);
       p[1] ^= *it;
       p[3] ^= *it;
@@ -152,7 +152,7 @@ constexpr uint64_t start_hash(char a) {
 }
 
 position::position()
-    : _hash{start_hash(12)}, pieces{{0x00000fff, 0xfff00000, 0, 0}},
+    : _hash{start_hash(12)}, pieces{{0x00000fffu, 0xfff00000u, 0, 0}},
       to_play{BLACK} {}
 
 ostream &operator<<(ostream &o, const position &p) {
@@ -169,7 +169,7 @@ ostream &operator<<(ostream &o, const position &p) {
   else
     o << black << "To play: Black" << color_reset << '\n';
   for (unsigned piece = 1; piece; piece <<= 1) {
-    if (piece & 0x0f0f0f0f)
+    if (piece & 0x0f0f0f0fu)
       o << null_square;
 
     if (piece & p[0])
@@ -183,9 +183,9 @@ ostream &operator<<(ostream &o, const position &p) {
     else
       o << black << ' ';
 
-    if (piece & 0xf0f0f0f0)
+    if (piece & 0xf0f0f0f0u)
       o << null_square;
-    if (piece & 0x88888888)
+    if (piece & 0x88888888u)
       o << color_reset << '\n';
   }
   o << color_reset;
