@@ -24,22 +24,15 @@ int alphabeta::eval(const position &p, int d, int alpha, int beta) {
       return -e(p);
   }
 
-  if (cache.contains(d, p.hash()))
-    return cache(d, p.hash());
-
-  int local_alpha = alpha;
   int best_score = -inf;
 
   for (const position &next : moves) {
-    const int score = -eval(next, d - 1, -beta, -local_alpha);
+    const int score = -eval(next, d - 1, -beta, -alpha);
     best_score = max(best_score, score);
     if (best_score > beta)
-      return best_score;
-    local_alpha = max(local_alpha, best_score);
+      break;
+    alpha = max(alpha, best_score);
   }
-
-  if (beta > best_score && best_score > alpha)
-    cache(d, p.hash()) = best_score;
 
   return best_score;
 }

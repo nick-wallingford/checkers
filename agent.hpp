@@ -2,7 +2,6 @@
 
 #include <random>
 
-#include "hashmap.hpp"
 #include "heuristic.hpp"
 
 class position;
@@ -32,23 +31,12 @@ public:
   position get_move(const position &);
 };
 
-class negamax : public agent {
-  std::default_random_engine r;
-  int eval(const position &, int) const;
-
-public:
-  negamax(const heuristic &e, int depth, char side)
-      : agent(e, depth, side), r{std::random_device()()} {}
-  position get_move(const position &);
-};
-
 class alphabeta : public agent {
-  hashmap cache;
   std::default_random_engine r;
   int eval(const position &, int, int alpha, int beta);
 
 public:
   alphabeta(const heuristic &e, int depth, char side)
-      : agent(e, depth, side), cache{20}, r{std::random_device{}()} {}
+      : agent(e, depth, side), r{std::random_device{}()} {}
   position get_move(const position &);
 };
