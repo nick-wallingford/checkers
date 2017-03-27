@@ -19,6 +19,7 @@ class alphabeta_pv : public agent {
 
   int eval(const position &, unsigned char depth, int alpha, int beta,
            bool maximize);
+  void sort(std::vector<position> &, uint64_t);
 
 public:
   /**
