@@ -14,7 +14,7 @@ class heuristic {
   int score;
 
 public:
-  heuristic() : kingweight{19}, score{0} {}
+  heuristic(int kingweight = 20) : kingweight{kingweight}, score{0} {}
   void mutate();
   void add_evaluator(eval_names n, int weight) {
     evaluators.emplace_back(n, weight);

@@ -12,13 +12,25 @@
 
 using namespace std;
 
+static heuristic best_heuristic() {
+  heuristic e{14};
+  e.add_evaluator(eval_trapped_kings, 2);
+  e.add_evaluator(eval_pyramid, 13);
+  e.add_evaluator(eval_centralized_kings, 2);
+  e.add_evaluator(eval_dyke, 8);
+  e.add_evaluator(eval_a_diagonal, 12);
+  e.add_evaluator(eval_b_diagonal, 13);
+  e.add_evaluator(eval_c_diagonal, 13);
+  e.add_evaluator(eval_d_diagonal, 8);
+  e.add_evaluator(eval_e_diagonal, 11);
+  e.add_evaluator(eval_f_diagonal, 14);
+  e.add_evaluator(eval_g_diagonal, 12);
+
+  return e;
+}
+
 template <class S, class T, int depth = 8> char game_test() {
-  heuristic e;
-  e.add_evaluator(eval_pyramid, 15);
-  e.add_evaluator(eval_d_diagonal, 15);
-  e.add_evaluator(eval_dyke, 10);
-  e.add_evaluator(eval_centralized_kings, 3);
-  e.add_evaluator(eval_trapped_kings, 5);
+  heuristic e = best_heuristic();
 
   position p;
   S black{e, depth, BLACK};
@@ -56,19 +68,7 @@ static void usage() {
 }
 
 static void train() {
-  heuristic e;
-
-  e.add_evaluator(eval_trapped_kings, 11);
-  e.add_evaluator(eval_pyramid, 13);
-  e.add_evaluator(eval_centralized_kings, 9);
-  e.add_evaluator(eval_dyke, 11);
-  e.add_evaluator(eval_a_diagonal, 10);
-  e.add_evaluator(eval_b_diagonal, 11);
-  e.add_evaluator(eval_c_diagonal, 10);
-  e.add_evaluator(eval_d_diagonal, 9);
-  e.add_evaluator(eval_e_diagonal, 14);
-  e.add_evaluator(eval_f_diagonal, 10);
-  e.add_evaluator(eval_g_diagonal, 8);
+  heuristic e = best_heuristic();
 
   trainer t{{e}, 10, 10};
   for (;;) {
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     if (string{"--train"}.compare(argv[i]) == 0)
       train();
     else if (string{"--cpu-game"}.compare(argv[i]) == 0)
-      game_test<alphabeta_pv, alphabeta_pv, 2>();
+      game_test<alphabeta_pv, alphabeta_pv, 10>();
     else if (string{"--game"}.compare(argv[i]) == 0)
       game();
     else
