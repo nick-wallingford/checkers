@@ -70,11 +70,14 @@ static void usage() {
 static void train() {
   heuristic e = best_heuristic();
 
-  trainer t{{e}, 10, 10};
+  trainer t{{e}, 10, 8};
   for (;;) {
     t();
     ofstream o{"training_data.txt", ios_base::app};
     o << '\n' << t << endl;
+#ifdef MEASURE_BRANCHING_FACTOR
+    alphabeta_pv_report_branching();
+#endif
   }
 }
 
@@ -91,6 +94,10 @@ int main(int argc, char **argv) {
       game();
     else
       usage();
+
+#ifdef MEASURE_BRANCHING_FACTOR
+  alphabeta_pv_report_branching();
+#endif
 
   return 0;
 }

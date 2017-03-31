@@ -17,6 +17,14 @@ class alphabeta_pv : public agent {
   std::unique_ptr<uint64_t[]> pv_min;
   std::ranlux24 r{std::random_device{}()};
 
+#ifdef MEASURE_BRANCHING_FACTOR
+  uint64_t branch_sum;
+  uint64_t branch_square_sum;
+  uint64_t move_sum;
+  uint64_t move_square_sum;
+  uint64_t branch_count;
+#endif
+
   int eval(const position &, unsigned char depth, int alpha, int beta,
            bool maximize);
   void sort(std::vector<position> &, uint64_t);
@@ -40,4 +48,12 @@ public:
    * @throws resign If the agent has lost or chooses to resign.
    */
   position get_move(const position &);
+
+#ifdef MEASURE_BRANCHING_FACTOR
+  ~alphabeta_pv();
+#endif
 };
+
+#ifdef MEASURE_BRANCHING_FACTOR
+void alphabeta_pv_report_branching();
+#endif
