@@ -7,11 +7,11 @@
 using namespace std;
 
 #ifdef MEASURE_BRANCHING_FACTOR
-atomic<uint64_t> branch_sum_g{0};
-atomic<uint64_t> branch_square_sum_g{0};
-atomic<uint64_t> move_sum_g{0};
-atomic<uint64_t> move_square_sum_g{0};
-atomic<uint64_t> branch_count_g{0};
+static atomic<uint64_t> branch_sum_g{0};
+static atomic<uint64_t> branch_square_sum_g{0};
+static atomic<uint64_t> move_sum_g{0};
+static atomic<uint64_t> move_square_sum_g{0};
+static atomic<uint64_t> branch_count_g{0};
 #endif
 
 constexpr const int inf = numeric_limits<int>::max();
@@ -43,16 +43,15 @@ alphabeta_pv::alphabeta_pv(const heuristic &e, int d, char side)
 
 int alphabeta_pv::eval(const position &p, unsigned char d, int alpha, int beta,
                        bool maximize) {
-  int branches = 0;
   if (!d)
     return side == BLACK ? e(p) : -e(p);
 
   uint64_t &pv = maximize ? pv_max[p.hash() & (size_t)mask_max]
                           : pv_min[p.hash() & (size_t)mask_min];
-
   vector<position> moves = p.moves();
 
 #ifdef MEASURE_BRANCHING_FACTOR
+  int branches = 0;
   branch_count++;
   move_sum += moves.size();
   move_square_sum += moves.size() * moves.size();
@@ -149,6 +148,9 @@ alphabeta_pv::~alphabeta_pv() {
 }
 
 void alphabeta_pv_report_branching() {
+  if (!branch_count_g)
+    return;
+
   const double branch_square_sum = branch_square_sum_g;
   const double branch_sum = branch_sum_g;
   const double move_sum = move_sum_g;

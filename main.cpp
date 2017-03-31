@@ -70,13 +70,14 @@ static void usage() {
 static void train() {
   heuristic e = best_heuristic();
 
-  trainer t{{e}, 10, 8};
+  trainer t{{e}, 12, 12};
   for (;;) {
     t();
     ofstream o{"training_data.txt", ios_base::app};
     o << '\n' << t << endl;
 #ifdef MEASURE_BRANCHING_FACTOR
     alphabeta_pv_report_branching();
+    alphabeta_report_branching();
 #endif
   }
 }
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
     if (string{"--train"}.compare(argv[i]) == 0)
       train();
     else if (string{"--cpu-game"}.compare(argv[i]) == 0)
-      game_test<alphabeta_pv, alphabeta_pv, 10>();
+      game_test<alphabeta_pv, alphabeta, 12>();
     else if (string{"--game"}.compare(argv[i]) == 0)
       game();
     else
@@ -97,6 +98,7 @@ int main(int argc, char **argv) {
 
 #ifdef MEASURE_BRANCHING_FACTOR
   alphabeta_pv_report_branching();
+  alphabeta_report_branching();
 #endif
 
   return 0;
