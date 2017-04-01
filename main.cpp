@@ -4,7 +4,6 @@
 #include <vector>
 
 #ifdef MEASURE_BRANCHING_FACTOR
-#include <atomic>
 #include <thread>
 #endif
 
