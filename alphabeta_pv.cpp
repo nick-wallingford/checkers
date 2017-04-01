@@ -147,7 +147,7 @@ alphabeta_pv::~alphabeta_pv() {
   branch_count_g += branch_count;
 }
 
-void alphabeta_pv_report_branching() {
+void alphabeta_pv::report_branching() {
   if (!branch_count_g)
     return;
 

@@ -50,10 +50,7 @@ public:
   position get_move(const position &);
 
 #ifdef MEASURE_BRANCHING_FACTOR
+  static void report_branching();
   ~alphabeta_pv();
 #endif
 };
-
-#ifdef MEASURE_BRANCHING_FACTOR
-void alphabeta_pv_report_branching();
-#endif

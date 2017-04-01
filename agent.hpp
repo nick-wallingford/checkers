@@ -56,9 +56,6 @@ public:
   position get_move(const position &);
 #ifdef MEASURE_BRANCHING_FACTOR
   ~alphabeta();
+  static void report_branching();
 #endif
 };
-
-#ifdef MEASURE_BRANCHING_FACTOR
-void alphabeta_report_branching();
-#endif

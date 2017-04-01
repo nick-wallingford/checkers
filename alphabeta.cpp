@@ -1,10 +1,13 @@
 #include "agent.hpp"
 
-#include <atomic>
 #include <cassert>
 #include <iostream>
 #include <limits>
 #include <vector>
+
+#ifdef MEASURE_BRANCHING_FACTOR
+#include <atomic>
+#endif
 
 #include "position.hpp"
 
@@ -38,7 +41,7 @@ int alphabeta::eval(const position &p, int d, int alpha, int beta) {
 #endif
 
   if (moves.empty())
-    return -inf;
+    return p.player() == side ? -inf + depth - d : inf - depth + d;
 
   int best_score = -inf;
 
@@ -101,7 +104,7 @@ alphabeta::~alphabeta() {
   branch_count_g += branch_count;
 }
 
-void alphabeta_report_branching() {
+void alphabeta::report_branching() {
   if (!branch_count_g)
     return;
   const double branch_square_sum = branch_square_sum_g;
