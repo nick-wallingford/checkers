@@ -96,17 +96,18 @@ bool position::capture_moves(vector<position> &list, const unsigned piece,
 vector<position> position::moves() const {
   sanity();
 
-  vector<position> captures;
-  vector<position> regular;
+  vector<position> moves;
 
   for (char king = 2; king--;) {
     const char mobility = king ? (UP | DOWN) : (to_play + 1);
-    for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it) {
-      assert(*it & mine());
+    for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it)
+      capture_moves(moves, *it, mobility);
+  }
 
-      capture_moves(captures, *it, mobility);
-
-      if (captures.empty()) {
+  if (moves.empty()) {
+    for (char king = 2; king--;) {
+      const char mobility = king ? (UP | DOWN) : (to_play + 1);
+      for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it) {
         for (board_iterator move{get_moves(*it, mobility)}; move.valid();
              ++move) {
           if (*move & all())
@@ -120,16 +121,13 @@ vector<position> position::moves() const {
           p(p.to_play, king) ^= *it;
           p(p.to_play, king) ^= *move;
 
-          regular.emplace_back(p);
+          moves.emplace_back(p);
         }
       }
     }
   }
 
-  if (captures.empty())
-    captures = std::move(regular);
-
-  for (position &p : captures) {
+  for (position &p : moves) {
     for (board_iterator it{p[0] & 0xf0000000u}; it.valid(); ++it) {
       p._hash ^= zob(*it, 0, 0) ^ zob(*it, 0, 1);
       p[0] ^= *it;
@@ -144,7 +142,7 @@ vector<position> position::moves() const {
     p.to_play ^= 1;
   }
 
-  return captures;
+  return moves;
 }
 
 constexpr uint64_t start_hash(char a) {
