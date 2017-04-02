@@ -22,6 +22,8 @@ public:
     refresh();
     wrefresh(win);
   }
+  selection_window(const selection_window &) = delete;
+  ~selection_window() { delwin(win); }
   void operator()(const vector<string> &s, int n) {
     wclear(win);
     for (int i = s.size(); i--;) {

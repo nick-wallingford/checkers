@@ -39,6 +39,7 @@ public:
    * @param side WHITE or BLACK: chooses which side the agent is.
    */
   alphabeta_pv(const heuristic &e, int d, char side);
+  alphabeta_pv(alphabeta_pv &&) = default;
   /**
    * Searches for a good move and returns the best move found.
    *
