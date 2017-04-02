@@ -3,7 +3,7 @@ OBJ := $(SRC:.cpp=.o)
 
 LDFLAGS += $(CXXFLAGS)
 CXXFLAGS += -std=gnu++11 -pipe -march=native -Wall -Wextra -MMD -D_GNU_SOURCE
-LDLIBS += -lncurses -lpthread
+LDLIBS += -lpthread -lncursesw
 
 release: CXXFLAGS += -O3 -DNDEBUG
 release: checkers

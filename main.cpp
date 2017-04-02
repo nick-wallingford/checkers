@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
     else if (string{"--cpu-game"}.compare(argv[i]) == 0)
       game_test<alphabeta_pv, alphabeta_pv, 12>();
     else if (string{"--game"}.compare(argv[i]) == 0)
-      game();
+      play_game();
 #ifdef MEASURE_BRANCHING_FACTOR
     else if (string{"--branch"}.compare(argv[i]) == 0)
       measure_branching<alphabeta_pv>();
