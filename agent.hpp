@@ -16,6 +16,7 @@ public:
   class resign {};
   agent(const heuristic &e, int depth, char side)
       : e{e}, depth{depth}, side{side} {}
+  char get_side() const { return side; }
   virtual ~agent() {}
   virtual position get_move(const position &) = 0;
 };

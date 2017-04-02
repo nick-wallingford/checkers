@@ -29,3 +29,5 @@ public:
 
   friend std::ostream &operator<<(std::ostream &o, const heuristic &);
 };
+
+heuristic best_heuristic();

@@ -6,6 +6,23 @@
 
 using namespace std;
 
+heuristic best_heuristic() {
+  heuristic e{14};
+  e.add_evaluator(eval_trapped_kings, 2);
+  e.add_evaluator(eval_pyramid, 13);
+  e.add_evaluator(eval_centralized_kings, 2);
+  e.add_evaluator(eval_dyke, 8);
+  e.add_evaluator(eval_a_diagonal, 12);
+  e.add_evaluator(eval_b_diagonal, 13);
+  e.add_evaluator(eval_c_diagonal, 13);
+  e.add_evaluator(eval_d_diagonal, 8);
+  e.add_evaluator(eval_e_diagonal, 11);
+  e.add_evaluator(eval_f_diagonal, 14);
+  e.add_evaluator(eval_g_diagonal, 12);
+
+  return e;
+}
+
 int heuristic::operator()(const position &p) const {
   const char king_count = __builtin_popcount(p[2] | p[3]);
 
@@ -46,9 +63,9 @@ void heuristic::mutate() {
     }
 }
 
-std::ostream &operator<<(std::ostream& o,const heuristic &h) {
+std::ostream &operator<<(std::ostream &o, const heuristic &h) {
   o << "{(score:" << h.score << "),(kingweight:" << h.kingweight << ')';
-  for(pair<eval_names,int> e : h.evaluators)
+  for (pair<eval_names, int> e : h.evaluators)
     o << ",(" << eval_names_text[e.first] << ',' << e.second << ')';
   o << '}';
   return o;
