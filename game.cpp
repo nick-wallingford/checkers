@@ -26,6 +26,8 @@ public:
   ~selection_window() { delwin(win); }
   void operator()(const vector<string> &s, int n) {
     wclear(win);
+    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+
     for (int i = s.size(); i--;) {
       if (n == i)
         wattron(win, COLOR_PAIR(null));
@@ -93,6 +95,12 @@ public:
     refresh();
     wrefresh(win);
   }
+  void clear() {
+    wclear(win);
+    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+    refresh();
+    wrefresh(win);
+  }
 };
 
 class game_manager {
@@ -117,6 +125,7 @@ public:
 
         const vector<position> moves{p.moves()};
         if (moves.empty()) {
+          move_win.clear();
           sel_win({"You have been defeated."}, 0);
           getch();
           return;
@@ -145,10 +154,12 @@ public:
         }
         p = moves[n];
       }
+      move_win.clear();
       sel_win({"The game has ended in a draw."}, 0);
       getch();
       return;
     } catch (agent::resign) {
+      move_win.clear();
       sel_win({"The computer has resigned. You win!"}, 0);
       getch();
       return;
