@@ -7,18 +7,18 @@
 using namespace std;
 
 heuristic best_heuristic() {
-  heuristic e{14};
-  e.add_evaluator(eval_trapped_kings, 2);
-  e.add_evaluator(eval_pyramid, 13);
+  heuristic e{15};
+  e.add_evaluator(eval_trapped_kings, 5);
+  e.add_evaluator(eval_pyramid, 12);
   e.add_evaluator(eval_centralized_kings, 2);
-  e.add_evaluator(eval_dyke, 8);
+  e.add_evaluator(eval_dyke, 10);
   e.add_evaluator(eval_a_diagonal, 12);
-  e.add_evaluator(eval_b_diagonal, 13);
-  e.add_evaluator(eval_c_diagonal, 13);
+  e.add_evaluator(eval_b_diagonal, 15);
+  e.add_evaluator(eval_c_diagonal, 15);
   e.add_evaluator(eval_d_diagonal, 8);
   e.add_evaluator(eval_e_diagonal, 11);
-  e.add_evaluator(eval_f_diagonal, 14);
-  e.add_evaluator(eval_g_diagonal, 12);
+  e.add_evaluator(eval_f_diagonal, 13);
+  e.add_evaluator(eval_g_diagonal, 15);
 
   return e;
 }
