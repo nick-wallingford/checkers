@@ -7,6 +7,8 @@
 
 using namespace std;
 
+// These values are automatically generated in util.cpp and copy-pasted here.
+// These values each correspond to a type of piece in a specific board position.
 static const uint64_t zobrist_player = 0xedf5d879fc98a912;
 static const std::array<std::array<uint64_t, 32>, 4> zobrist{
     {{{0x40eab28baa02a864, 0x874a7dca277a4fb0, 0x581ea36751b3d470,
@@ -58,10 +60,14 @@ static inline uint64_t zob(unsigned piece, bool player, bool king) {
   return zobrist[2 * king + player][__builtin_clz(piece)];
 }
 
+// Adds the capture moves a given piece with a given mobility has available to
+// the list. Returns true if moves were added, false if no moves were added.
 bool position::capture_moves(vector<position> &list, const unsigned piece,
                              const char mobility) const {
   bool capture = false;
   assert(piece & mine());
+  assert(mobility == (UP | DOWN) ? (piece & pieces[to_play + 2])
+                                 : (piece & pieces[to_play]));
 
   for (capture_iterator it{piece, mobility}; it.valid(); ++it) {
     if (all() & it.capturing()) // if there's a piece where we're going, skip
@@ -69,82 +75,112 @@ bool position::capture_moves(vector<position> &list, const unsigned piece,
     if (!(theirs() & it.captured()))
       continue; // if we're not capturing an enemy piece, skip
 
+    // This is a valid capture.
+    capture = true;
+
     position p{*this};
 
+    // We are USING a king to capture.
     const bool capturing_king = mobility == (UP | DOWN);
+    // We have captured a king.
     const bool captured_king = it.captured() & p(to_play ^ 1, 1);
 
     assert(p(p.to_play, capturing_king) & piece);
     assert(p(1 ^ p.to_play, captured_king) & it.captured());
 
+    // Actually perform the capture on the board.
+
+    // Remove the piece from where we are.
+    p(p.to_play, capturing_king) ^= piece;
+    // Add the piece to where we're going.
+    p(p.to_play, capturing_king) ^= it.capturing();
+    // Remove the piece we have captured.
+    p(1 ^ to_play, captured_king) ^= it.captured();
+
+    // Update the hash for after the capture has taken place.
     p._hash ^= zob(piece, p.to_play, capturing_king);
     p._hash ^= zob(it.capturing(), p.to_play, capturing_king);
     p._hash ^= zob(it.captured(), 1 ^ p.to_play, captured_king);
 
-    p(p.to_play, capturing_king) ^= piece;
-    p(p.to_play, capturing_king) ^= it.capturing();
-    p(1 ^ to_play, captured_king) ^= it.captured();
-
-    capture = true;
-    if (!p.capture_moves(list, it.capturing(), mobility)) {
+    // Check for double jumps and...
+    if (!p.capture_moves(list, it.capturing(), mobility))
+      // If there are no double jumps, add this move to the move list.
       list.emplace_back(p);
-    }
   }
   return capture;
 }
 
+// Retrieves a list of available moves.
 vector<position> position::moves() const {
   sanity();
 
   vector<position> moves;
 
+  // Process all available captures.
   for (char king = 2; king--;) {
     const char mobility = king ? (UP | DOWN) : (to_play + 1);
     for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it)
       capture_moves(moves, *it, mobility);
   }
 
+  // If a capture is available, it must be taken. So only update regular moves
+  // if there are no captures.
   if (moves.empty()) {
+    // Do kings first, (king == 1) regular pieces (king == 0) second.
     for (char king = 2; king--;) {
       const char mobility = king ? (UP | DOWN) : (to_play + 1);
+      // Iterate over the pieces on the board
       for (board_iterator it{(*this)(to_play, king)}; it.valid(); ++it) {
+        // Iterate over the places it can move to.
         for (board_iterator move{get_moves(*it, mobility)}; move.valid();
              ++move) {
+          // This piece can't move here; continue;
           if (*move & all())
             continue;
 
           position p{*this};
 
+          // Remove the piece from where we are
+          p(p.to_play, king) ^= *it;
+          // Add the piece where we're moving to.
+          p(p.to_play, king) ^= *move;
+
+          // Update hash.
           p._hash ^= zob(*move, p.to_play, king);
           p._hash ^= zob(*it, p.to_play, king);
 
-          p(p.to_play, king) ^= *it;
-          p(p.to_play, king) ^= *move;
-
+          // Add it to the list.
           moves.emplace_back(p);
         }
       }
     }
   }
 
+  // Upkeep the moves.
   for (position &p : moves) {
+    // Upgrade black pieces to kings.
     for (board_iterator it{p[0] & 0xf0000000u}; it.valid(); ++it) {
       p._hash ^= zob(*it, 0, 0) ^ zob(*it, 0, 1);
       p[0] ^= *it;
       p[2] ^= *it;
     }
+
+    // Upgrade white pieces to kings.
     for (board_iterator it{p[1] & 0x0000000fu}; it.valid(); ++it) {
       p._hash ^= zob(*it, 1, 0) ^ zob(*it, 1, 1);
       p[1] ^= *it;
       p[3] ^= *it;
     }
-    p._hash ^= zobrist_player;
+    // Update the active player.
     p.to_play ^= 1;
+    p._hash ^= zobrist_player;
   }
 
   return moves;
 }
 
+// Calculate the hash of the starting board position. This is a compile time
+// constant.
 constexpr uint64_t start_hash(char a) {
   return a ? (start_hash(a - 1) ^ zobrist[1][a - 1] ^ zobrist[0][32 - a]) : 0;
 }
