@@ -16,7 +16,7 @@
 
 using namespace std;
 
-template <class S, class T, int depth = 8> char game_test() {
+template <class S, class T> char game_test(int depth = 12) {
   heuristic e = best_heuristic();
 
   position p;
@@ -48,7 +48,7 @@ static void usage() {
        << " <arguments> can be any of:\n"
        << "  --train                Train the heuristic by playing the "
           "computer against itself.\n"
-       << "  --cpu-game             Showcase a CPU vs CPU match.\n"
+       << "  --cpu-game [depth]     Showcase a CPU vs CPU match.\n"
 #ifdef MEASURE_BRANCHING_FACTOR
        << "  --branch               Plays a few games to test the branching "
           "factor.\n"
@@ -109,9 +109,16 @@ int main(int argc, char **argv) {
   for (int i = 1; i < argc; i++)
     if (string{"--train"}.compare(argv[i]) == 0)
       train();
-    else if (string{"--cpu-game"}.compare(argv[i]) == 0)
-      game_test<alphabeta_pv, alphabeta_pv, 12>();
-    else if (string{"--game"}.compare(argv[i]) == 0)
+    else if (string{"--cpu-game"}.compare(argv[i]) == 0) {
+      int depth = 0;
+      if (i + 1 < argc)
+        depth = atoi(argv[i + 1]);
+      if (depth > 0)
+        ++i;
+      else
+        depth = 12;
+      game_test<alphabeta_pv, alphabeta_pv>(depth);
+    } else if (string{"--game"}.compare(argv[i]) == 0)
       play_game();
 #ifdef MEASURE_BRANCHING_FACTOR
     else if (string{"--branch"}.compare(argv[i]) == 0)
