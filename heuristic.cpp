@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// Returns the best known heuristic. These values were found via the training.
 heuristic best_heuristic() {
   heuristic e{15};
   e.add_evaluator(eval_trapped_kings, 5);
@@ -23,12 +24,21 @@ heuristic best_heuristic() {
   return e;
 }
 
+// Evaluates a position, and returns the integer corresponding to its
 int heuristic::operator()(const position &p) const {
+  // These are a sufficient, but not necessary condition to ensure a loss.
+  if (!__builtin_popcount(p[0] | p[2]))
+    return -1000000;
+  if (!__builtin_popcount(p[1] | p[3]))
+    return 1000000;
+
+  // Total number of kings on the board.
   const char king_count = __builtin_popcount(p[2] | p[3]);
 
   int retval = (__builtin_popcount(p[0]) - __builtin_popcount(p[1])) * 10;
   retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) * kingweight;
 
+  // If there are relatively few kings on the board, prioritize trading the off
   if (king_count < 6)
     retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) *
               (6 - king_count);
@@ -39,6 +49,7 @@ int heuristic::operator()(const position &p) const {
   return retval;
 }
 
+// Randomly increase, decrease, or leave unaffected each evaluator's weight.
 void heuristic::mutate() {
   mt19937 r{random_device()()};
   uniform_int_distribution<> dist{0, 2};
