@@ -8,18 +8,18 @@ using namespace std;
 
 // Returns the best known heuristic. These values were found via the training.
 heuristic best_heuristic() {
-  heuristic e{15};
-  e.add_evaluator(eval_trapped_kings, 5);
-  e.add_evaluator(eval_pyramid, 12);
-  e.add_evaluator(eval_centralized_kings, 2);
-  e.add_evaluator(eval_dyke, 10);
-  e.add_evaluator(eval_a_diagonal, 12);
-  e.add_evaluator(eval_b_diagonal, 15);
-  e.add_evaluator(eval_c_diagonal, 15);
-  e.add_evaluator(eval_d_diagonal, 8);
+  heuristic e{14};
+  e.add_evaluator(eval_trapped_kings, 4);
+  e.add_evaluator(eval_pyramid, 10);
+  e.add_evaluator(eval_centralized_kings, 1);
+  e.add_evaluator(eval_dyke, 9);
+  e.add_evaluator(eval_a_diagonal, 10);
+  e.add_evaluator(eval_b_diagonal, 14);
+  e.add_evaluator(eval_c_diagonal, 13);
+  e.add_evaluator(eval_d_diagonal, 9);
   e.add_evaluator(eval_e_diagonal, 11);
-  e.add_evaluator(eval_f_diagonal, 13);
-  e.add_evaluator(eval_g_diagonal, 15);
+  e.add_evaluator(eval_f_diagonal, 15);
+  e.add_evaluator(eval_g_diagonal, 17);
 
   return e;
 }
