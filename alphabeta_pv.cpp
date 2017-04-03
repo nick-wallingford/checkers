@@ -40,7 +40,7 @@ constexpr size_t pow(size_t base, int exp) {
                               : pow(base, exp / 2) * pow(base, exp / 2);
 }
 
-constexpr size_t mask_calc(int depth) { return pow(2, depth + 12) - 1; }
+constexpr size_t mask_calc(int depth) { return pow(2, depth + 11) - 1; }
 
 alphabeta_pv::alphabeta_pv(const heuristic &e, int d, char side)
     : agent{e, d, side}, mask_max{mask_calc(d)}, mask_min{mask_calc(d - 1)},
