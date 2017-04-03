@@ -115,6 +115,7 @@ vector<position> position::moves() const {
   sanity();
 
   vector<position> moves;
+  moves.reserve(16);
 
   // Process all available captures.
   for (char king = 2; king--;) {
