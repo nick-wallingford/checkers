@@ -15,6 +15,7 @@ static const array<unsigned, 7> diagonals{{
     0x84422111u, // black g line, white a line
 }};
 
+// Evaluates a diagonal. Does not evaluate the d diagonal.
 template <int d> int diagonal(const position &p, int weight) {
   static_assert(d > 0, "Invalid diagonal. Must be > 0");
   static_assert(d < 7, "Invalid diagonal. Must be < 7");
@@ -88,6 +89,7 @@ int eval_d_diagonal(const position &p, int weight) {
   return (black - white) * weight / 36;
 }
 
+// Gives points for having the pyramid intact
 int eval_pyramid(const position &p, int weight) {
   int black = __builtin_popcount(p[0] & 0x267u);
   black *= black;
