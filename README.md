@@ -2,12 +2,10 @@
 AI project to play checkers.
 
 Can be compiled on most *nix based systems with the `make` command.
+
 A debug build for use with GDB or Valgrind can be built with `make debug`.
 Diagnostics for average branch factor can be enabled with
 `CXXFLAGS=-DMEASURE_BRANCHING_FACTOR make`
-
-Requirements: ncurses, a c++11 compiler, make. Compiling on empress requires
-no additional steps other than `make`.
 
 The application can be run with ./checkers, displaying a usage summary.
 A game vs the AI can be played with `./checkers --game`. The user will be prompted
