@@ -54,7 +54,9 @@ static void usage() {
        << "  --branch               Plays a few games to test the branching "
           "factor.\n"
 #endif
-       << "  --game                 Play against the computer\n";
+       << "  --game                 Play against the computer\n"
+       << "Ensure UTF-8 support is enabled. In PuTTY, select:\n"
+       << "Configure -> Window -> Translation -> Remote character set -> UTF-8" << endl;
 
   exit(0);
 }

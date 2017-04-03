@@ -18,3 +18,6 @@ Alternatively, the computer can be instructed to play against itself with
 for the heuristic can be invoked with `./checkers --train`. If the executable
 was built with average branch factor diagnostics, this mode can be invoked
 with `./checkers --branch`.
+
+Ensure UTF-8 support is enabled. In PuTTY, select:
+Configure -> Window -> Translation -> Remote character set -> UTF-8
