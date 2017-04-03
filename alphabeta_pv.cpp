@@ -34,8 +34,16 @@ void alphabeta_pv::sort(vector<position> &moves, uint64_t pv) {
       swap(moves[1], moves[uniform_int_distribution<unsigned>{1, i}(r)]);
 }
 
+constexpr size_t pow(size_t base, int exp) {
+  return exp == 0 ? 1
+                  : (exp & 1) ? base * pow(base, exp)
+                              : pow(base, exp / 2) * pow(base, exp / 2);
+}
+
+constexpr size_t mask_calc(int depth) { return pow(2, depth + 12) - 1; }
+
 alphabeta_pv::alphabeta_pv(const heuristic &e, int d, char side)
-    : agent{e, d, side}, mask_max{(1 << 20) - 1}, mask_min{(1 << 19) - 1},
+    : agent{e, d, side}, mask_max{mask_calc(d)}, mask_min{mask_calc(d - 1)},
       pv_max(new uint64_t[mask_max + 1]()), pv_min(new uint64_t[mask_max + 1]())
 #ifdef MEASURE_BRANCHING_FACTOR
       ,

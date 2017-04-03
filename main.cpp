@@ -1,6 +1,7 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <locale.h>
 #include <vector>
 
 #ifdef MEASURE_BRANCHING_FACTOR
@@ -103,6 +104,7 @@ template <class T> void measure_branching() {
 #endif
 
 int main(int argc, char **argv) {
+  setlocale(LC_ALL, ""); // UTF-8 characters are used to represent the pieces.
   if (argc == 1)
     usage();
 

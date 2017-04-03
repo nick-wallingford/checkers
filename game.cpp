@@ -1,7 +1,6 @@
 #include "game.hpp"
 
 #include <iostream>
-#include <locale.h>
 #include <ncursesw/ncurses.h>
 
 #include "alphabeta_pv.hpp"
@@ -169,7 +168,6 @@ public:
 
 void play_game() {
   int row, col;
-  setlocale(LC_ALL, "");
 
   int depth = 0;
   do {
