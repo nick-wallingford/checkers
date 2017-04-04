@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
       play_game();
 #ifdef MEASURE_BRANCHING_FACTOR
     else if (string{"--branch"}.compare(argv[i]) == 0)
-      measure_branching<alphabeta_pv, 8>();
+      measure_branching<alphabeta_pv, 12>();
 #endif
     else
       usage();
