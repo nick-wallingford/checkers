@@ -56,9 +56,8 @@ static void usage() {
 #endif
        << "  --game                 Play against the computer\n"
        << "Ensure UTF-8 support is enabled. In PuTTY, select:\n"
-       << "Configure -> Window -> Translation -> Remote character set -> UTF-8" << endl;
-
-  exit(0);
+       << "Configure -> Window -> Translation -> Remote character set -> UTF-8"
+       << endl;
 }
 
 static void train() {
@@ -76,7 +75,7 @@ static void train() {
 }
 
 #ifdef MEASURE_BRANCHING_FACTOR
-template <class T> void measure_branching() {
+template <class T, int depth = 12> void measure_branching() {
   vector<thread> threads;
   mutex m;
 
@@ -84,8 +83,8 @@ template <class T> void measure_branching() {
     threads.emplace_back(thread{[&] {
       while (1) {
         heuristic e = best_heuristic();
-        T black{e, 12, BLACK};
-        T white{e, 12, WHITE};
+        T black{e, depth, BLACK};
+        T white{e, depth, WHITE};
         position p;
         try {
           for (int i = 192; i--;) {
@@ -126,7 +125,7 @@ int main(int argc, char **argv) {
       play_game();
 #ifdef MEASURE_BRANCHING_FACTOR
     else if (string{"--branch"}.compare(argv[i]) == 0)
-      measure_branching<alphabeta_pv>();
+      measure_branching<alphabeta_pv, 8>();
 #endif
     else
       usage();
