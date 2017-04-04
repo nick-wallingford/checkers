@@ -9,54 +9,35 @@ using namespace std;
 
 // These values are automatically generated in util.cpp and copy-pasted here.
 // These values each correspond to a type of piece in a specific board position.
-static const uint64_t zobrist_player = 0xedf5d879fc98a912;
-static const std::array<std::array<uint64_t, 32>, 4> zobrist{
-    {{{0x40eab28baa02a864, 0x874a7dca277a4fb0, 0x581ea36751b3d470,
-       0x4f735c246ca4f479, 0x2f1eedbac341d484, 0x91b4679784acbd94,
-       0xe166ffc3da42a83e, 0x9485b9ea33046e0d, 0x4e5671b10f23be50,
-       0x58f495a72d8dc7c,  0xb6d0a232181df436, 0x308186c3513b59ce,
-       0x20c07220106735bc, 0x1e57f138a9b50800, 0xb27ed7460b005ffd,
-       0xa121c15ce49afe65, 0x3b67d70e6790e175, 0x54067aeace73cf75,
-       0x339f2ccfed4b46a3, 0x8828eec94bf0e45b, 0x811402a947f8a379,
-       0x328fdd85f101030a, 0x73b518092a8e52f9, 0xb938ce6c0b0a6e1c,
-       0x690752fd731c48ab, 0x382820b3dc759b0,  0x35725de5c414ee22,
-       0x924c964e68eddf32, 0xad74e8792dc7cea6, 0x58d1d037111171f1,
-       0xefd2cc034dccc7b8, 0x2d18289854e06e1}},
-     {{0xe978684d16f45ec9, 0xeed0f142a9647fb9, 0x64038937ea94fb5c,
-       0x9dabbcb474785b76, 0x5afc788458cbdbee, 0x644d741753243da6,
-       0xd8cdb585aef40c97, 0x9a64cf3d74b2551e, 0x76634ccb011b526b,
-       0x50c98c182ce2c776, 0xa56034298155a3d9, 0x7559b78c801d4126,
-       0xbd95ff4bf442cad4, 0x7c0f6717059cdf5f, 0xcc42e6d646a4de57,
-       0x50cdb4f1e268b34e, 0x8c509bb0a789ca05, 0x824ac0630ad7f0f,
-       0x72c80d967db5cd19, 0x7af732115f6a9761, 0xc459beb5e9c521b5,
-       0x8ba252dad40801e5, 0xe0af0bcc72fec70f, 0x87ce0deaf901053c,
-       0xf87220163c0e8696, 0xde364614de64a446, 0x87c17b2ed8e922a8,
-       0x184bebcfb6237344, 0x9a6ada6e38667db,  0xa8fc491e7e0f1f50,
-       0x752212d20d1fdde4, 0x362ad2cd1f405877}},
-     {{0xe8ca4c65df984c61, 0x6684fa9f3e223b9c, 0xcbe14bbd545896a9,
-       0xbaba3d09a3de7818, 0x7458433c03899e93, 0x30dbb92099a75e4e,
-       0x71e9470f49877dd3, 0x29ce78b9dd3cb672, 0x43787c7ce50422e1,
-       0x5783cab3ed4d9c62, 0xc8ef78982a9d7dc8, 0x9e51d92df36fc8fc,
-       0x1f07244f448e879,  0x275a97095c5800be, 0xc4bb4dedbfb3fa1a,
-       0xc1ebfb6cb34bf3e4, 0xc58bf4fcb1c6e2ce, 0x6b70c9dacc9b241c,
-       0x502d5860904fd435, 0x109d698b383b8c1f, 0x96c0df136f7dfee2,
-       0x4fb1db2e7866d82c, 0xb3981adb7a000935, 0x5066a0ec505eee56,
-       0x51097ab0f2a55bfa, 0xb3ab27704a22c3bb, 0x62a558920273600,
-       0xe10f3da80a04aaaa, 0x6cc9f3ec0c39c5f3, 0x963f28c190ee4fc7,
-       0x9fafda24ab0b4747, 0x8b963ffc9d459993}},
-     {{0x907337ab331e42a6, 0xd8ec9044c7dc499c, 0x50f40a9f1254ac55,
-       0xad00218ab190cbb9, 0x1ccb0de99f089832, 0xf6f05e3993c6639e,
-       0xa90e481809392b89, 0x8b676cd1c974e6a6, 0x3c9a803234e0812f,
-       0x7d5d7ff127fe46c6, 0x333b53bf6c44b7b8, 0x92f1b372d70ca60b,
-       0xffba64c6cd3f7e39, 0xf9c6853a2f5b5a20, 0xc6dc784d6d54a191,
-       0xfa06b6d390c4b6fd, 0xe278403b891c9225, 0x796ce30804d58d78,
-       0x46564c69a9c22c2d, 0x9a2e5374905a21e2, 0xf0d65d150a4ee56c,
-       0x8a277f9f892ca67d, 0xdd74b3613a5a7de4, 0xc0bbc635b5b60a25,
-       0x96b599e615561722, 0xe855114fc5654372, 0xeb9d6adec5b6f81d,
-       0x1e0d5afe2323dffe, 0xbece13ddbd419395, 0x5166b79643aa7ea4,
-       0xdc5052f721e7c12c, 0x4e2159eaf7bbb0ce}}}};
 
-static inline uint64_t zob(unsigned piece, bool player, bool king) {
+static const unsigned zobrist_player = 0x6cb604b5;
+static const std::array<std::array<unsigned, 32>, 4> zobrist{
+    {{{0xe398febf, 0x3cf54331, 0x5e127ef5, 0x9b305601, 0xd7c2d8ef, 0x12b9188f,
+       0x897f0fdf, 0x310f92c4, 0xcd66e12e, 0xefab7ac9, 0x3666a518, 0x2fd73234,
+       0xfd0e0747, 0x546741fd, 0xa8de9b68, 0x5c97e2c9, 0x8c6c8a82, 0xef468c1,
+       0xe30be5b5, 0xd7227047, 0x93b3071c, 0xf3c9a041, 0xa7581095, 0x8d54b28a,
+       0xe1b1d25f, 0xf59e27fb, 0x82ca1f74, 0x313c5f13, 0x96b7673d, 0x1510bb70,
+       0xd91f8cec, 0x5e570d89}},
+     {{0x50dfb203, 0x13dc1f47, 0x3b1448e5, 0xc81c84ef, 0x6af6eac8, 0x1fc491f7,
+       0xc158b401, 0x68fed1d8, 0x869a6407, 0xb0ce9e57, 0x24818f97, 0x4cb25260,
+       0x1e43bf7c, 0x112e93d9, 0x9012504d, 0x164b10a7, 0x2ef786a3, 0xdbdd9f7b,
+       0x5e01ed47, 0x41b50343, 0x29364802, 0xe5c29c0,  0xa9d8f68a, 0x830b6498,
+       0x9da9232,  0xd86142d0, 0x54125372, 0xf3aaff60, 0xe34c0d98, 0x37dad68f,
+       0xa61ec8ab, 0xea432ef7}},
+     {{0xdb48768c, 0xba67c1d5, 0xe49f82b8, 0x3e31e1d1, 0xcc20d234, 0xb7218c68,
+       0xcc5f02bc, 0x4376eeed, 0x4fac2e0e, 0x410e1f8a, 0x5b6293fa, 0x3c822fe4,
+       0x17bfbc0a, 0xbacf9c02, 0xe8b10cb9, 0x505c5989, 0x432c46a5, 0xd3e8c72f,
+       0x54339de6, 0xf10437ca, 0x446a0a36, 0xbc500c53, 0xdd356cfd, 0xed6bfb64,
+       0x6e25cb20, 0x24249376, 0x7f3b4e66, 0xb0f8ed98, 0xde512299, 0xf5dc64c0,
+       0x4773e85a, 0x4bb5f0ed}},
+     {{0x81df1f36, 0x67006a34, 0xfb5e4517, 0x44460998, 0xc67ef59e, 0x41947394,
+       0x5b1eed8b, 0x89aed0b2, 0x821ea85a, 0x8e686313, 0x559a5729, 0xf8d827d7,
+       0x45900ab,  0x908c9bd6, 0x673d9b30, 0xff8597d1, 0xa6a46c1d, 0x448f3be7,
+       0x2854ef27, 0x3c3924d6, 0x9f361d2d, 0x8c2854cb, 0x29ba7f5e, 0xa8b7c53,
+       0x3a2d60e1, 0x17c0c01c, 0x6c67a13a, 0xe1124db4, 0x23e0b402, 0xbf0f1211,
+       0xab3838,   0x9e6fada3}}}};
+
+static inline unsigned zob(unsigned piece, bool player, bool king) {
   return zobrist[2 * king + player][__builtin_clz(piece)];
 }
 
@@ -182,7 +163,7 @@ vector<position> position::moves() const {
 
 // Calculate the hash of the starting board position. This is a compile time
 // constant.
-constexpr uint64_t start_hash(char a) {
+constexpr unsigned start_hash(char a) {
   return a ? (start_hash(a - 1) ^ zobrist[1][a - 1] ^ zobrist[0][32 - a]) : 0;
 }
 
@@ -237,7 +218,7 @@ void position::sanity() const {
   assert(__builtin_popcount(pieces[0] | pieces[2]) <= 12);
   assert(__builtin_popcount(pieces[1] | pieces[3]) <= 12);
 
-  uint64_t h = to_play == BLACK ? 0 : zobrist_player;
+  unsigned h = to_play == BLACK ? 0 : zobrist_player;
 
   for (int i = 4; i--;) {
     for (board_iterator it{pieces[i]}; it.valid(); ++it) {
