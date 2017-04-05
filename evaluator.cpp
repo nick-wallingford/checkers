@@ -113,9 +113,9 @@ int eval_safe_kings(const position &p, int weight) {
       retval--;
   } else if (__builtin_popcount(p[3]) > __builtin_popcount(p[2])) {
     if (__builtin_popcount(p[2] & 0x00000011) == 1)
-      retval--;
+      retval++;
     if (__builtin_popcount(p[2] & 0x88000000) == 1)
-      retval--;
+      retval++;
   }
 
   return retval * weight;
