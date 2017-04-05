@@ -22,13 +22,13 @@ constexpr const int inf = 1000000000;
 // moves are promoted to the front of the list. Except in extraordinarily
 // unusual circumstances, only one move should match pv. With fairly high
 // probability, one move should match pv.
-void alphabeta_pv::sort(vector<position> &moves, uint64_t pv) {
+void alphabeta_pv::sort(vector<position> &moves, uint8_t pv) {
   // Move the front move into a random position in the list.
   swap(moves.front(), moves[uniform_int_distribution<unsigned>{
                           0, (unsigned)moves.size() - 1}(r)]);
   vector<position>::iterator front_it = moves.begin();
   for (unsigned i = moves.size(); --i;)
-    if (moves[i].hash() == pv) // Move a PV match to the front.
+    if ((uint8_t)moves[i].hash() == pv) // Move a PV match to the front.
       swap(*front_it++, moves[i]);
     else // Otherwise put it into a random position.
       swap(moves[1], moves[uniform_int_distribution<unsigned>{1, i}(r)]);
@@ -40,11 +40,11 @@ constexpr size_t pow(size_t base, int exp) {
                               : pow(base, exp / 2) * pow(base, exp / 2);
 }
 
-constexpr size_t mask_calc(int depth) { return pow(2, depth + 11) - 1; }
+constexpr size_t mask_calc(int depth) { return pow(2, depth + 14) - 1; }
 
 alphabeta_pv::alphabeta_pv(const heuristic &e, int d, char side)
     : agent{e, d, side}, mask_max{mask_calc(d)}, mask_min{mask_calc(d - 1)},
-      pv_max(new uint64_t[mask_max + 1]()), pv_min(new uint64_t[mask_max + 1]())
+      pv_max(new uint8_t[mask_max + 1]()), pv_min(new uint8_t[mask_max + 1]())
 #ifdef MEASURE_BRANCHING_FACTOR
       ,
       branch_sum(0), branch_square_sum(0), move_sum(0), move_square_sum(0),
@@ -70,8 +70,8 @@ int alphabeta_pv::eval(const position &p, unsigned char d, int alpha, int beta,
     return side == BLACK ? e(p) : -e(p);
 
   // pv is a reference to the hash value in the
-  uint64_t &pv = maximize ? pv_max[p.hash() & (size_t)mask_max]
-                          : pv_min[p.hash() & (size_t)mask_min];
+  uint8_t &pv = maximize ? pv_max[p.hash() & (size_t)mask_max]
+                         : pv_min[p.hash() & (size_t)mask_min];
   vector<position> moves = p.moves();
 
 #ifdef MEASURE_BRANCHING_FACTOR
@@ -150,7 +150,7 @@ int alphabeta_pv::eval(const position &p, unsigned char d, int alpha, int beta,
 // Gets the 'best' move from a given starting point.
 // Throws agent::resign if the match is lost.
 position alphabeta_pv::get_move(const position &p) {
-  uint64_t &pv = pv_max[p.hash() & (size_t)mask_max];
+  uint8_t &pv = pv_max[p.hash() & (size_t)mask_max];
   vector<position> moves = p.moves();
 #ifdef MEASURE_BRANCHING_FACTOR
   branch_count++;

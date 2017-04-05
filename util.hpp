@@ -96,3 +96,4 @@ public:
 };
 
 void gen_hash_64();
+void gen_hash_32();

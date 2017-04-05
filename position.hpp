@@ -10,7 +10,7 @@
 
 class position {
 private:
-  uint64_t _hash;
+  unsigned _hash;
   /**
    * Array of positions on the board of the four different types of pieces.
    * pieces[0] are the black regular pieces.
@@ -45,7 +45,7 @@ public:
   }
 
   std::vector<position> moves() const;
-  std::uint64_t hash() const { return _hash; }
+  unsigned hash() const { return _hash; }
   void sanity() const
 #ifndef NDEBUG
       ;
