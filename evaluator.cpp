@@ -100,9 +100,30 @@ int eval_pyramid(const position &p, int weight) {
   return (black - white) * weight / 36;
 }
 
+int eval_safe_kings(const position &p, int weight) {
+  if (__builtin_popcount(p[0] | p[1] | p[2] | p[3]) > 6)
+    return 0;
+
+  int retval = 0;
+
+  if (__builtin_popcount(p[2]) > __builtin_popcount(p[3])) {
+    if (__builtin_popcount(p[3] & 0x00000011) == 1)
+      retval--;
+    if (__builtin_popcount(p[3] & 0x88000000) == 1)
+      retval--;
+  } else if (__builtin_popcount(p[3]) > __builtin_popcount(p[2])) {
+    if (__builtin_popcount(p[2] & 0x00000011) == 1)
+      retval--;
+    if (__builtin_popcount(p[2] & 0x88000000) == 1)
+      retval--;
+  }
+
+  return retval * weight;
+}
+
 int eval_centralized_kings(const position &p, int weight) {
-  int retval = __builtin_popcount(p[2] & 0x00666600u);
-  retval -= __builtin_popcount(p[3] & 0x00666600u);
+  int retval = __builtin_popcount(p[2] & 0x00466200u);
+  retval -= __builtin_popcount(p[3] & 0x00466200u);
   return weight * retval;
 }
 

@@ -20,6 +20,7 @@ heuristic best_heuristic() {
   e.add_evaluator(eval_e_diagonal, 11);
   e.add_evaluator(eval_f_diagonal, 15);
   e.add_evaluator(eval_g_diagonal, 17);
+  e.add_evaluator(eval_safe_kings, 3);
 
   return e;
 }
