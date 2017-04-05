@@ -21,7 +21,6 @@ heuristic best_heuristic() {
   e.add_evaluator(eval_f_diagonal, 15);
   e.add_evaluator(eval_g_diagonal, 17);
   e.add_evaluator(eval_safe_kings, 3);
-  e.add_evaluator(eval_trade_material, 6);
 
   return e;
 }
