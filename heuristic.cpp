@@ -21,28 +21,22 @@ heuristic best_heuristic() {
   e.add_evaluator(eval_f_diagonal, 15);
   e.add_evaluator(eval_g_diagonal, 17);
   e.add_evaluator(eval_safe_kings, 3);
+  e.add_evaluator(eval_trade_material, 6);
 
   return e;
 }
 
 // Evaluates a position, and returns the integer corresponding to its
 int heuristic::operator()(const position &p) const {
-  // These are a sufficient, but not necessary condition to ensure a loss.
-  if (!__builtin_popcount(p[0] | p[2]))
-    return -1000000;
-  if (!__builtin_popcount(p[1] | p[3]))
-    return 1000000;
-
-  // Total number of kings on the board.
-  const char king_count = __builtin_popcount(p[2] | p[3]);
-
+  // Base heuristic is just the material count.
   int retval = (__builtin_popcount(p[0]) - __builtin_popcount(p[1])) * 10;
   retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) * kingweight;
 
-  // If there are relatively few kings on the board, prioritize trading the off
-  if (king_count < 6)
-    retval += (__builtin_popcount(p[2]) - __builtin_popcount(p[3])) *
-              (6 - king_count);
+  // These are a sufficient, but not necessary condition to ensure a loss.
+  if (!__builtin_popcount(p[0] | p[2]))
+    retval -= 1000000;
+  if (!__builtin_popcount(p[1] | p[3]))
+    retval += 1000000;
 
   for (const auto &eval : evaluators)
     retval += eval_funcs[eval.first](p, eval.second);

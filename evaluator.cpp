@@ -45,6 +45,19 @@ namespace eval {
  * They must also be within namespace eval{}
  */
 
+int eval_trade_material(const position &p, int weight) {
+  const int white = __builtin_popcount(p[1] | p[3]) + __builtin_popcount(p[3]);
+  const int black = __builtin_popcount(p[0] | p[2]) + __builtin_popcount(p[2]);
+
+  if (black + white < weight) {
+    if (black > white)
+      return -white;
+    else if (white > black)
+      return black;
+  }
+  return 0;
+}
+
 int eval_dyke(const position &p, int weight) {
   int black = __builtin_popcount(p[0] & 0x44223u);
   black *= black;
