@@ -173,7 +173,7 @@ void play_game() {
   do {
     cout << "Enter the desired search depth: ";
     cin >> depth;
-  } while (depth <= 0 && depth >= 20);
+  } while (depth <= 0 || depth >= 20);
 
   int player = 0;
   do {
