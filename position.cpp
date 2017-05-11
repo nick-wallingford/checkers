@@ -168,8 +168,8 @@ constexpr unsigned start_hash(char a) {
 }
 
 position::position()
-    : _hash{start_hash(12)}, pieces{{0x00000fffu, 0xfff00000u, 0, 0}},
-      to_play{BLACK} {}
+    : pieces{{0x00000fffu, 0xfff00000u, 0, 0}},
+  to_play{BLACK}, _hash{start_hash(12)} {}
 
 ostream &operator<<(ostream &o, const position &p) {
   const string null_square{"\e[47;1m "};

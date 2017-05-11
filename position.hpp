@@ -10,7 +10,6 @@
 
 class position {
 private:
-  unsigned _hash;
   /**
    * Array of positions on the board of the four different types of pieces.
    * pieces[0] are the black regular pieces.
@@ -24,6 +23,7 @@ private:
    * Indicates which color is to play.
    */
   char to_play;
+  unsigned _hash;
 
   bool capture_moves(std::vector<position> &, const unsigned, const char) const;
   unsigned theirs() const {
